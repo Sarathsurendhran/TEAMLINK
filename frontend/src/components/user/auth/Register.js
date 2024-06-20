@@ -6,7 +6,8 @@ import { Link, useNavigate} from 'react-router-dom'
 
 const Register = ()=>{
 
-  const baseURL = process.env.baseURL
+  const baseURL = process.env.REACT_APP_baseURL
+  const navigate = useNavigate()
 
   // validating user input data
   const validate = (e)=>{
@@ -48,7 +49,6 @@ const Register = ()=>{
       toast.warning("Password should contain at least 8 characters");
       return false;
     }
-    toast.success("set")
     return true
   }
   
@@ -57,42 +57,53 @@ const Register = ()=>{
     e.preventDefault()
 
     const formData = new FormData()
-    formData.append('username', e.target.username.value)
-    formData.append('email', e.target.username.value)
-    formData.append('password', e.target.username.value)
+    formData.append('username', e.target.username.value.trim())
+    formData.append('email', e.target.email.value.trim())
+    formData.append('password', e.target.password.value.trim())
 
     if(validate(e)){
 
       try{
-        const res = await axios.post(baseURL+'/user/register/', formData)
+        console.log(formData)
+        const res = await axios.post(`${baseURL}user/register/`, formData)
         if(res.status === 201){
           sessionStorage.setItem('registrationEmail', e.target.email.value)
           navigate(
             '/otp',
             {
-              state:res.data.Message
+              state:res.data.message
             }
           )
-          toast.success(res.data.Message)
+          toast.success(res.data.message)
           return res
         }
       }
-      catch(error){
-        if(error.response && error.response.data && error.response.data.message){
-          error.response.data.message.forEach(errorMessage =>{
-            toast.error(errorMessage)
-          })
-        }else{
-          toast.error('An error occurred. Please try again later')
+      catch(error) {
+        let errorMessage;
+    
+        if (error.response && error.response.data && error.response.data.message) {
+            // Check if message is an array
+            if (Array.isArray(error.response.data.message)) {
+                error.response.data.message.forEach(errorMessage => {
+                    toast.error(errorMessage);
+                });
+            } else {
+                // If message is not an array, treat it as a single string message
+                toast.error(error.response.data.message);
+            }
+        } else {
+            toast.error('An error occurred. Please try again later');
         }
-        if(error.response.status === 406){
-          console.log(error.response.data)
-          toast.error(error.response.data.message)
-          
-        }else{
-          console.log(error)
+    
+        if (error.response.status === 406) {
+            console.log(error.response.data);
+            // Assuming message is a string in this case
+            toast.error(error.response.data.message);
+        } else {
+            console.log(error);
         }
-      }
+    }
+    
     }
   }
 

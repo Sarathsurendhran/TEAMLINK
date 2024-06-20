@@ -1,7 +1,86 @@
 import React from "react";
 import logo from "../../../assets/logo.png"
+import { toast } from "react-toastify";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import {useDispatch} from 'react-redux'
+import {jwtDecode} from 'jwt-decode'
+import { setAuthentication } from "../../../Redux/Authentication/authenticationSlice";
 
 const Login = ()=>{
+
+  const baseURL = process.env.REACT_APP_baseURL
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const validate = (e)=>{
+
+    let email = e.target.email.value
+    let password = e.target.password.value
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      toast.warning('Invalid Email Format');
+      return false;
+    }
+
+    if(password.includes(' ')){
+      toast.warning("Passsword should not include blank space")
+      return false
+    }
+
+    if(password.length < 8){
+      toast.warning("Password should contain atleast 8 characters")
+      return false
+    }
+    return true
+  }
+
+
+  const handleSubmit = async(e)=>{
+    e.preventDefault()
+
+    if(validate(e)){
+      const formData = new FormData()
+      formData.append('email', e.target.email.value)
+      formData.append('password', e.target.password.value)
+
+      try{
+        const res = await axios.post(`${baseURL}user/user-login/`, formData)
+        if (res.status === 200){
+
+          const decodedToken = jwtDecode(res.data.access_token);
+
+          // Add data to the redux store
+          dispatch(
+            setAuthentication({
+              id: decodedToken.user_id,
+              username: decodedToken.username,
+              isAuthenticated:true,
+              isAdmin:res.data.is_admin
+            })
+          )
+          navigate('/createworkspace')
+
+          toast.success("Login Success")
+          
+        }
+      }catch(error){
+        console.log("eroorrr:", error)
+        if(error.response.status && error.response.status === 406){
+          toast.error(error.response.data.message)
+        }else{
+          console.log(error)
+        }
+      }
+
+    }
+
+  }
+
+
+
   return (
     <>
     <div className="w-full text-gray-900 flex justify-center sm:px-10 lg:px-40 xl:px-80">
@@ -48,34 +127,38 @@ const Login = ()=>{
                 Or sign in with e-mail
               </div>
             </div>
-            <div className="mx-auto max-w-sm">
-              <input
-                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                type="email"
-                placeholder="Email"
-              />
-              <input
-                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                type="password"
-                placeholder="Password"
-              />
-              
-              <button className="mt-5 tracking-wide font-semibold bg-[#7157FE] text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
-                <svg
-                  className="w-6 h-6 -ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                  <circle cx="8.5" cy={7} r={4} />
-                  <path d="M20 8v6M23 11h-6" />
-                </svg>
-                <span className="ml-3">Sign In With Email</span>
-              </button>
-            </div>
+            <form onSubmit={handleSubmit}>
+                <div className="mx-auto max-w-sm">
+                  <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                    type="email"
+                    placeholder="Email"
+                    name="email"
+                  />
+                  <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                    type="password"
+                    placeholder="Password"
+                    name="password"
+                  />
+                  
+                  <button className="mt-5 tracking-wide font-semibold bg-[#7157FE] text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
+                    <svg
+                      className="w-6 h-6 -ml-2"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                      <circle cx="8.5" cy={7} r={4} />
+                      <path d="M20 8v6M23 11h-6" />
+                    </svg>
+                    <span className="ml-3">Sign In With Email</span>
+                  </button>
+                </div>
+              </form>
           </div>
         </div>
       </div>

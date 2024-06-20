@@ -25,7 +25,7 @@ const CreateWorkSpace = ()=>{
                 placeholder="Workspace Name" 
               />
             <button className="w-full max-w-md mt-5 bg-[#7157FE] rounded-md text-white text-lg px-4 py-2 hover:bg-indigo-600">Create a Workspace</button>
-            <p className=" max-w-md text-xs mt-3">By continuing, you’re agreeing to our Main Services Agreement, User Terms of Service, and Slack Supplemental Terms. Additional disclosures are available in our Privacy Policy and Cookie Policy.</p>
+            <p className=" max-w-md text-xs mt-3">By continuing, you’re agreeing to our Main Services Agreement, User Terms of Service, and TeamLink Supplemental Terms. Additional disclosures are available in our Privacy Policy and Cookie Policy.</p>
           </div>
 
           <div className="flex w-full   md:w-1/2  ">
