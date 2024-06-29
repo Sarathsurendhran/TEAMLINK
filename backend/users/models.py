@@ -34,6 +34,7 @@ class User(AbstractBaseUser):
     is_verified = models.BooleanField(default=False)
     date_joined = models.DateField(auto_now_add=True)
     otp = models.CharField(max_length=6, null=True)
+    workspace_id = models.CharField(max_length=20, null=True)
 
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

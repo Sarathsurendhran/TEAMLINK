@@ -5,15 +5,15 @@ from rest_framework.views import APIView
 from users.send_otp import send_otp
 from rest_framework import status
 from users.models import User
-from rest_framework.exceptions import ParseError, AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import make_password
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from django.contrib.auth import authenticate, login
+from django.middleware.csrf import get_token
+from django.conf import settings
+from django.middleware import csrf
+from workspaces.models import WorkSpaces, WorkSpaceMembers
 
-from .serializers import (
-    UserRegisterSerializer,
-    VerifyEmailSerializer,
-)
+
+from .serializers import UserRegisterSerializer, VerifyEmailSerializer, LoginSerializer
 
 
 @api_view(["GET"])
@@ -89,57 +89,52 @@ class VerifyOtp(APIView):
             print(e)
 
 
-
 class LoginView(APIView):
     def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
 
-        email = request.data.get("email").strip()
-        password = request.data.get("password").strip()
+            # Generate new refresh token for the user
+            refresh = RefreshToken.for_user(user)
+            access_token = refresh.access_token
 
-        if not email or not password:
-            content = {"message": "All Fields Are Required"}
-            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+            # Adding custom claims
+            refresh["username"] = str(user.username)
+            refresh["isAdmin"] = user.is_superuser
 
-        if not User.objects.filter(email=email).exists():
-            content = {"message": "Invalid Email Address"}
-            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+            # Workspace handling
+            workspaces = False
+            if user.workspace_id:
+                try:
+                    workspace = WorkSpaces.objects.get(id=user.workspace_id)
+                    if not WorkSpaceMembers.objects.filter(
+                        user_id=user.id, workspace_id=workspace.id
+                    ):
+                        WorkSpaceMembers.objects.create(
+                            is_admin=False, user_id=user.id, workspace_id=workspace.id, display_name=user.username
+                        )
+                except WorkSpaces.DoesNotExist:
+                    print("Workspace does not exist")
+                except Exception as e:
+                    print(f"Error: {e}")
 
-        
-        if User.objects.filter(email=email, is_active=False).exists():
-            content = {"message": "You are blocked by the Admin!"}
-            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
-        
+            try:
+                if (
+                    WorkSpaces.objects.filter(created_by=user.id).exists()
+                    or WorkSpaceMembers.objects.filter(user_id=user.id).exists()
+                ):
+                    workspaces = True
+            except Exception as e:
+                print(f"Error: {e}")
 
-        user = authenticate(username=email, password=password)
-        if user is None:
-            content = {"message": "Invalid Password!"}
-            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+            content = {
+                "refresh": str(refresh),
+                "access": str(access_token),
+                "is_admin": user.is_superuser,
+                "workspaces": workspaces,
+            }
 
-        user_obj = User.objects.get(email=email)
-        if not user_obj.is_verified:
-            content = {"message": "Email is not verified!"}
-            return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response(content, status=status.HTTP_200_OK)
 
-        # Generate new refresh token for the user
-        refresh = RefreshToken.for_user(user)
-        access_token = refresh.access_token
-
-       
-        # Adding claims
-        access_token["username"] = str(user.username)
-        access_token["is_admin"] = user.is_superuser
-
-
-        response = Response({
-            "message": "Login Success",
-            "access_token": str(access_token),  
-            "is_admin": user.is_superuser
-        }, status=status.HTTP_200_OK)
-
-        response.set_cookie(
-            key="refresh", value=str(refresh), httponly=True, samesite="Lax"
-        )
-        response.set_cookie(
-            key="access", value=str(access_token), httponly=True, samesite="Lax"
-        )
-        return response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

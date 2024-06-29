@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import logo from "../../../assets/logo.png"
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -12,6 +12,8 @@ const Login = ()=>{
   const baseURL = process.env.REACT_APP_baseURL
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
 
   const validate = (e)=>{
 
@@ -40,44 +42,76 @@ const Login = ()=>{
 
   const handleSubmit = async(e)=>{
     e.preventDefault()
+    setErrors({});
+    setMessage('');
 
     if(validate(e)){
       const formData = new FormData()
       formData.append('email', e.target.email.value)
       formData.append('password', e.target.password.value)
+      
 
       try{
         const res = await axios.post(`${baseURL}user/user-login/`, formData)
         if (res.status === 200){
 
-          const decodedToken = jwtDecode(res.data.access_token);
+          localStorage.setItem('access', res.data.access)
+          localStorage.setItem('refresh', res.data.refresh)
 
+       
           // Add data to the redux store
-          dispatch(
+           dispatch(
             setAuthentication({
-              id: decodedToken.user_id,
-              username: decodedToken.username,
+              id:jwtDecode(res.data.access).user_id,
+              username:jwtDecode(res.data.access).username,
               isAuthenticated:true,
-              isAdmin:res.data.is_admin
+              isAdmin:jwtDecode(res.data.access).isAdmin
             })
           )
-          navigate('/createworkspace')
+
+          // if the user has already workspaces
+          if(res.data.workspaces){
+
+            navigate('/workspaces')
+
+          }else{
+
+            navigate('/createworkspace')
+
+          }
 
           toast.success("Login Success")
           
         }
-      }catch(error){
-        console.log("eroorrr:", error)
-        if(error.response.status && error.response.status === 406){
-          toast.error(error.response.data.message)
-        }else{
-          console.log(error)
+      } catch (error) {
+        console.log("error:", error);
+        if (error.response) {
+            const { status, data } = error.response;
+            if (status === 406) {
+                toast.error(data.message);
+            } else if (status === 400) {
+                handleValidationErrors(data);
+            } else {
+                toast.error("An unexpected error occurred. Please try again later.");
+            }
+        } else {
+            toast.error("Network error. Please check your connection and try again.");
         }
-      }
+    }
 
     }
 
   }
+
+  const handleValidationErrors = (errors) => {
+    for (const key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            const errorMessages = errors[key];
+            errorMessages.forEach(message => toast.error(message));
+        }
+    }
+    setErrors(errors);
+};
 
 
 
