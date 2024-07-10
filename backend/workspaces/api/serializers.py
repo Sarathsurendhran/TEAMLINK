@@ -16,14 +16,33 @@ class WorkSpaceSerializer(serializers.ModelSerializer):
 
 class EmailListSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    workspace_id = serializers.IntegerField()
 
     def validate_email(self, value):
         """
-        Check that the user is not already in the workspace.
+        check that the emial is verified
+
         """
-        if WorkSpaceMembers.objects.filter(user__email=value).exists():
-            raise serializers.ValidationError("The user is already in the workspace.")
+        # We can perform any email specific validation
+
         return value
+
+    def validate(self, data):
+        """
+        This method is called after individual field validations but before create and update.
+
+        In here checking that the user is not already in the workspace.
+
+        """
+
+        email = data.get("email")
+        workspace_id = data.get("workspace_id")
+
+        if WorkSpaceMembers.objects.filter(
+            user__email=email, workspace_id=workspace_id
+        ).exists():
+            raise serializers.ValidationError("This user is already in the Workspace")
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,8 +58,18 @@ class WorkspaceMemberSerializer(serializers.ModelSerializer):
         model = WorkSpaceMembers
         fields = "__all__"
 
+    def to_representation(self, instance):
+        if instance.is_active:  
+            return super().to_representation(instance)
+        return None
+
 
 class WorkSpaceSerializerForWorkspace(serializers.ModelSerializer):
     class Meta:
         model = WorkSpaces
-        fields = '__all__'
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["workspace_name"] = representation["workspace_name"].upper()
+        return representation

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'users',
     'workspaces',
+    'admin_side',
 
     # drf
     'rest_framework',
@@ -116,6 +117,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'users.middlewares.BlockCheckMiddleware'
 ]
 
 # Allow all origins

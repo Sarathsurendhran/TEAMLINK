@@ -39,7 +39,7 @@ const CreateWorkSpace = () => {
       );
       if (res.status === 201) {
   
-        navigate("workspacehome");
+        navigate("/workspaces");
       }
     } catch (error) {
       console.log(error);

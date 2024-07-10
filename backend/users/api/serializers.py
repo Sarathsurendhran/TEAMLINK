@@ -17,24 +17,14 @@ from django.contrib.auth import authenticate
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        exclude = ("password",)
-
-
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        token['username'] = user.username
-
-        return token
+        exclude = ("password", "otp")
 
 
 class UserRegisterSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password", "workspace_id"]
+        fields = ["id", "username", "email", "password", "encrypted_data"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -49,7 +39,6 @@ class UserRegisterSerializer(ModelSerializer):
 class VerifyEmailSerializer(Serializer):
     email = EmailField()
     otp = CharField()
-
 
 
 class LoginSerializer(serializers.Serializer):

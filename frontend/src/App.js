@@ -6,7 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import UserWrapper from "./components/wrapper/userwrapper";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import store, {persistor } from "./Redux/userStore";
+import store, { persistor } from "./Redux/userStore";
+import AdminWrapper from "./components/wrapper/admin_wrapper";
+import CheckingIsBlocked from "./components/wrapper/checking_isblocked";
+
+
 
 function App() {
   return (
@@ -15,7 +19,8 @@ function App() {
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <Routes>
-              <Route path="/*" element={<UserWrapper />} />
+              <Route path="/*" element={<CheckingIsBlocked><UserWrapper /></CheckingIsBlocked>} />
+              <Route path="/admin/*" element={<AdminWrapper/>} />
             </Routes>
           </PersistGate>
         </Provider>

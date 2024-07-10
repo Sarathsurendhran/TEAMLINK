@@ -10,9 +10,10 @@ from django.contrib.auth import authenticate, login
 from django.middleware.csrf import get_token
 from django.conf import settings
 from django.middleware import csrf
+from cryptography.fernet import Fernet
+from decouple import config
+
 from workspaces.models import WorkSpaces, WorkSpaceMembers
-
-
 from .serializers import UserRegisterSerializer, VerifyEmailSerializer, LoginSerializer
 
 
@@ -89,30 +90,67 @@ class VerifyOtp(APIView):
             print(e)
 
 
+# decrypting the encrypted data from the user database and return email and workspace_id
+def decrypt_data(encrypted_data):
+    # Decode base64 and ensure it's bytes
+    encrypted_data = encrypted_data.encode("utf-8")
+
+    key = config("KEY")
+    cipher_suite = Fernet(key)
+
+    # decrypt data
+    decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+    # Decode bytes to string
+    decrypted_data_str = decrypted_data.decode("utf-8")
+
+    # Split decrypted string into email and workspace_id
+    email, workspace_id = decrypted_data_str.split(":")
+
+    return email, workspace_id
+
+
 class LoginView(APIView):
+
+    def generate_refresh_token_with_claims(self, user):
+        refresh = RefreshToken.for_user(user)
+
+        # Custom claims
+        refresh["username"] = str(user.username)
+        refresh["isAdmin"] = user.is_superuser
+
+        return refresh
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data["user"]
 
-            # Generate new refresh token for the user
-            refresh = RefreshToken.for_user(user)
+            # Custom method to generate refresh token with custom claims
+            refresh = self.generate_refresh_token_with_claims(user)
             access_token = refresh.access_token
 
-            # Adding custom claims
-            refresh["username"] = str(user.username)
-            refresh["isAdmin"] = user.is_superuser
+            workspace_id = None
+            if user.encrypted_data:
+                datas = decrypt_data(user.encrypted_data)
+                email, workspace_id = datas
 
             # Workspace handling
             workspaces = False
-            if user.workspace_id:
+            if workspace_id:
+                """
+                checking the user is already in the workspaces if not creating a user
+
+                """
                 try:
-                    workspace = WorkSpaces.objects.get(id=user.workspace_id)
+                    workspace = WorkSpaces.objects.get(id=workspace_id)
                     if not WorkSpaceMembers.objects.filter(
                         user_id=user.id, workspace_id=workspace.id
                     ):
                         WorkSpaceMembers.objects.create(
-                            is_admin=False, user_id=user.id, workspace_id=workspace.id, display_name=user.username
+                            is_admin=False,
+                            user_id=user.id,
+                            workspace_id=workspace.id,
                         )
                 except WorkSpaces.DoesNotExist:
                     print("Workspace does not exist")
@@ -120,6 +158,7 @@ class LoginView(APIView):
                     print(f"Error: {e}")
 
             try:
+                # if the user is in the workspace changing the workspace flag True so the user can redirect to different page in frontend
                 if (
                     WorkSpaces.objects.filter(created_by=user.id).exists()
                     or WorkSpaceMembers.objects.filter(user_id=user.id).exists()
@@ -138,3 +177,68 @@ class LoginView(APIView):
             return Response(content, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserChecking(APIView):
+    def post(self, request, params):
+        if params:
+            datas = decrypt_data(params)
+            email, workspace_id = datas
+            try:
+                workspace = WorkSpaces.objects.get(id=workspace_id)
+                user = User.objects.get(email=email)
+                if user:
+                    try:
+                        if not WorkSpaceMembers.objects.filter(
+                            user_id=user.id, workspace_id=workspace.id
+                        ):
+                            WorkSpaceMembers.objects.create(
+                                is_admin=False,
+                                user_id=user.id,
+                                workspace_id=workspace.id,
+                            )
+
+                    except WorkSpaces.DoesNotExist:
+                        print("Workspace does not exist")
+
+                    except Exception as e:
+                        print(f"Error: {e}")
+
+                    return Response(
+                        {"message": "Welcome Back Please Login"},
+                        status=status.HTTP_208_ALREADY_REPORTED,
+                    )
+
+            except WorkSpaces.DoesNotExist:
+                return Response(
+                    {"message": "Worskspace does not exist!"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            except User.DoesNotExist:
+                return Response(
+                    {"message": " User does not exist!"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            except Exception as e:
+                print(f"Error: {e}")
+                return Response(
+                    {"message": "Something Went Wrong!"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+
+
+class CheckIsBlocked(APIView):
+    def get(self, request):
+        user_id = request.query_params.get('user_id')
+        print("user_id", user_id)
+        try:
+            user_data = User.objects.get(id=user_id)
+            if not user_data.is_active:
+                return Response({"message":"user is blocked"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message":"user is active"}, status=status.HTTP_202_ACCEPTED)
+        except Exception as e:
+            return Response({"message":"something went wrong"})
