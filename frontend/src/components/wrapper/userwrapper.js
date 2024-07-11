@@ -15,6 +15,8 @@ import HomePage from "../../pages/home_page";
 import ThreeDBackground from "../vantajs/ThreeDBackground";
 import UserCheckingWrapper from "./userchecking_wrapper";
 import WorkspaceIsblocked from "./checking_workspace_isblocked";
+import { useRoutes } from "react-router-dom";
+import GroupChat from "../user/chat/GroupChat";
 
 const UserWrapper = () => {
   const authentication_user = useSelector((state) => state.authentication_user);
@@ -39,65 +41,65 @@ const UserWrapper = () => {
     }
   }, [authentication_user]);
 
-  return (
-    <>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ThreeDBackground>
-              <HomePage />
-            </ThreeDBackground>
-          }
-        />
-        <Route path="/otp" element={<OTP />} />
-        <Route
-          path="/register"
-          element={
-            <UserCheckingWrapper>
-              <LoginPrivateRoute>
-                <Register />
-              </LoginPrivateRoute>
-            </UserCheckingWrapper>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <LoginPrivateRoute>
-              <Login />
-            </LoginPrivateRoute>
-          }
-        />
-        <Route
-          path="/createworkspace"
-          element={
-            <PrivateRoutes>
-              <CreateWorkSpace />
-            </PrivateRoutes>
-          }
-        />
-        <Route
-          path="/workspaces"
-          element={
-            <PrivateRoutes>
-              <WorkSpaces />
-            </PrivateRoutes>
-          }
-        />
-        <Route
-          path="/createworkspace/workspacehome"
-          element={
-            <PrivateRoutes>
-              <WorkspaceIsblocked>
-                <WorkspaceHome />
-              </WorkspaceIsblocked>
-            </PrivateRoutes>
-          }
-        />
-      </Routes>
-    </>
-  );
+  const routes = useRoutes([
+    {
+      path: "/workspacehome",
+      element: (
+        <PrivateRoutes>
+          <WorkspaceIsblocked>
+            <WorkspaceHome />
+          </WorkspaceIsblocked>
+        </PrivateRoutes>
+      ),
+      children: [{ path: "chat", element:<GroupChat/> }],
+    },
+
+    {
+      path: "/register",
+      element: (
+        <UserCheckingWrapper>
+          <LoginPrivateRoute>
+            <Register />
+          </LoginPrivateRoute>
+        </UserCheckingWrapper>
+      ),
+    },
+    {
+      path: "/login",
+      element: (
+        <LoginPrivateRoute>
+          <Login />
+        </LoginPrivateRoute>
+      ),
+    },
+    {
+      path: "/createworkspace",
+      element: (
+        <PrivateRoutes>
+          <CreateWorkSpace />
+        </PrivateRoutes>
+      ),
+    },
+    {
+      path: "/workspaces",
+      element: (
+        <PrivateRoutes>
+          <WorkSpaces />
+        </PrivateRoutes>
+      ),
+    },
+    {
+      path: "/",
+      element: (
+        <ThreeDBackground>
+          <HomePage />
+        </ThreeDBackground>
+      ),
+    },
+    { path: "/otp", element: <OTP /> },
+  ]);
+
+  return routes;
 };
 
 export default UserWrapper;

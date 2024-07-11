@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'workspaces',
     'admin_side',
+    'group_chat',
 
     # drf
     'rest_framework',

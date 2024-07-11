@@ -49,7 +49,7 @@ const WorkSpaces = () => {
   const handleLaunch = async (id) => {
     dispatch(setWorkspaceId(id));
 
-    navigate(`/createworkspace/workspacehome`);
+    navigate(`/workspacehome`);
   };
 
   return (

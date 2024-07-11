@@ -13,7 +13,7 @@ const AdminWrapper = () => {
       element: (
         <AdminPrivateRoutes>
           <AdminLayout />
-        </AdminPrivateRoutes>
+        </AdminPrivateRoutes> 
       ),
       children: [
         { path: "/", element: <AdminDashboard /> },
