@@ -9,27 +9,32 @@ const AdminUserList = () => {
   const accessToken = localStorage.getItem("access");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [nextPage, setNextPage] = useState(null);
+  const [prevPage, setPrevPage] = useState(null);
+
   useEffect(() => {
-    const fetchuserData = async () => {
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        };
-        const response = await axios.get(`${baseURL}admin/users-list/`, config);
-        if (response.status === 200) {
-          console.log(response.data);
-          console.log("success");
-          setUsers(response.data);
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error("Something went wrong!");
-      }
-    };
     fetchuserData();
   }, [accessToken]);
+
+  const fetchuserData = async (url = `${baseURL}admin/users-list/`) => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+      const response = await axios.get(url, config);
+      if (response.status === 200) {
+        console.log("success");
+        setUsers(response.data.results);
+        setNextPage(response.data.next);
+        setPrevPage(response.data.previous);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong!");
+    }
+  };
 
   // handling the user status
   const handleUserStatus = async (user_id) => {
@@ -40,7 +45,8 @@ const AdminUserList = () => {
         },
       };
       const response = await axios.post(
-        `${baseURL}admin/change-user-status/${user_id}/`, config
+        `${baseURL}admin/change-user-status/${user_id}/`,
+        config
       );
       if (response.status === 200) {
         // set user status for component rerender
@@ -60,7 +66,6 @@ const AdminUserList = () => {
     }
   };
 
-  
   const handleSearchInputChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -68,6 +73,14 @@ const AdminUserList = () => {
   const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleNextPage = () => {
+    fetchuserData(nextPage);
+  };
+
+  const handlePrevPage = () => {
+    fetchuserData(prevPage);
+  };
 
   return (
     <>
@@ -180,6 +193,40 @@ const AdminUserList = () => {
                 ))}
               </tbody>
             </table>
+
+            {/* Pagination controls */}
+            <div className="flex justify-between items-center py-4">
+              {prevPage ? (
+                <button
+                  className="px-4 py-2 text-sm text-gray-700 bg-white border rounded-lg hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+                  onClick={handlePrevPage}
+                >
+                  Previous
+                </button>
+              ) : (
+                <button
+                  className="px-4 py-2 text-sm text-gray-700 bg-white border rounded-lg hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+                  disabled
+                >
+                  Previous
+                </button>
+              )}
+              {nextPage ? (
+                <button
+                  className="px-4 py-2 text-sm text-gray-700 bg-white border rounded-lg hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+                  onClick={handleNextPage}
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  className="px-4 py-2 text-sm text-gray-700 bg-white border rounded-lg hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+                  disabled
+                >
+                  Next
+                </button>
+              )}
+            </div>
             {/* <div className="flex justify-between items-center py-4">
               <button className="px-4 py-2 text-sm text-gray-700 bg-white border rounded-lg hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
                 Previous

@@ -24,7 +24,7 @@ const WorkspaceHeader = () => {
   
 
   return (
-    <nav className="bg-[#543ae9] h-12">
+    <nav className="bg-[#543ae9] border-blue-950 h-6 fixed top-0 left-0 right-0">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-12 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -86,8 +86,8 @@ const WorkspaceHeader = () => {
 
 
 
-  {/* Profile dropdown */}
-            <div className="relative ml-3">
+          {/* Profile dropdown */}
+            {/* <div className="relative ml-3">
               <div>
                 <button
                   type="button"
@@ -115,24 +115,7 @@ const WorkspaceHeader = () => {
                 aria-labelledby="user-menu-button"
                 tabIndex={-1}
               >
-                {/* <a
-                  href="#"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-300"
-                  role="menuitem"
-                  tabIndex={-1}
-                  id="user-menu-item-0"
-                >
-                  Your Profile
-                </a>
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-300"
-                  role="menuitem"
-                  tabIndex={-1}
-                  id="user-menu-item-1"
-                >
-                  Settings
-                </a> */}
+              
                 <a
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-300"
@@ -144,7 +127,7 @@ const WorkspaceHeader = () => {
                   Log out
                 </a>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

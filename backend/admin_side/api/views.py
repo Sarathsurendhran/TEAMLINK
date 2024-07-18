@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from users.api.serializers import UserSerializer
 from users.models import User
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from workspaces.models import WorkSpaces, WorkSpaceMembers
 from .serializer import WorkspaceSerializer
 from .permissions import IsSuperUser
@@ -14,9 +15,12 @@ class UserList(APIView):
 
     def get(self, request):
         try:
+            paginator = PageNumberPagination()
+            paginator.page_size = 5
             users = User.objects.filter(is_superuser=False)
-            serializer = UserSerializer(users, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            result_page = paginator.paginate_queryset(users, request)
+            serializer = UserSerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
         except User.DoesNotExist:
             return Response(
                 {"error": "Users not found"}, status=status.HTTP_404_NOT_FOUND
@@ -72,13 +76,19 @@ class WorkspaceList(APIView):
 
     def get(self, request):
         try:
+            paginator = PageNumberPagination()
+            paginator.page_size = 5
             workspaces = WorkSpaces.objects.all()
-            serializer = WorkspaceSerializer(workspaces, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            result_page = paginator.paginate_queryset(workspaces, request)
+            serializer = WorkspaceSerializer(result_page, many=True)
+
+            return paginator.get_paginated_response(serializer.data)
+
         except Exception as e:
             print(e)
             return Response(
-                {"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+                {"message": "Something went wrong", "error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 

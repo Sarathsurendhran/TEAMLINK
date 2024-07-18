@@ -14,14 +14,21 @@ const CreateWorkSpace = () => {
     e.preventDefault();
 
     let workspace_name = e.target.workspace_name.value;
+    let workspace_description = e.target.workspace_description.value;
 
     if (!workspace_name) {
-      toast.warning("Workspace cannot be empty!");
-
+      toast.warning("Workspace Name cannot be empty!");
       return false;
     }
+
+    if (!workspace_description) {
+      toast.warning("Workspace Descriptiion cannot be empty!");
+      return false;
+    }
+
     const formData = new FormData();
     formData.append("workspace_name", workspace_name);
+    formData.append("workspace_description", workspace_description);
 
     try {
       const access_token = localStorage.getItem("access");
@@ -38,7 +45,6 @@ const CreateWorkSpace = () => {
         config
       );
       if (res.status === 201) {
-  
         navigate("/workspaces");
       }
     } catch (error) {
@@ -51,7 +57,7 @@ const CreateWorkSpace = () => {
     <>
       <div className="flex justify-center min-h-screen bg-white">
         <div className="bg-white p-6  max-w-5xl w-full">
-          <div className="-ml-10">
+          <div className="-ml-10 ">
             <img src={logo} className="w-60 mx-auto" />
           </div>
 
@@ -73,6 +79,14 @@ const CreateWorkSpace = () => {
                   placeholder="Workspace Name"
                   name="workspace_name"
                 />
+
+                <textarea
+                  className="w-full max-w-md  px-8 py-6 rounded-lg font-medium bg-gray-100 border border-gray-400 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-3"
+                  type="text"
+                  placeholder="Workspace Description"
+                  name="workspace_description"
+                />
+
                 <button className="w-full max-w-md mt-5 bg-[#7157FE] rounded-md text-white text-lg px-4 py-2 hover:bg-indigo-600">
                   Create a Workspace
                 </button>

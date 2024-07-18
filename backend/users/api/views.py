@@ -16,6 +16,8 @@ from decouple import config
 from workspaces.models import WorkSpaces, WorkSpaceMembers
 from .serializers import UserRegisterSerializer, VerifyEmailSerializer, LoginSerializer
 
+from workspaces.models import WorkSpaceMembers
+
 
 @api_view(["GET"])
 def getRoutes(request):
@@ -229,16 +231,32 @@ class UserChecking(APIView):
                 )
 
 
-
 class CheckIsBlocked(APIView):
     def get(self, request):
-        user_id = request.query_params.get('user_id')
+        user_id = request.query_params.get("user_id")
         print("user_id", user_id)
         try:
             user_data = User.objects.get(id=user_id)
             if not user_data.is_active:
-                return Response({"message":"user is blocked"}, status=status.HTTP_200_OK)
+                return Response(
+                    {"message": "user is blocked"}, status=status.HTTP_200_OK
+                )
             else:
-                return Response({"message":"user is active"}, status=status.HTTP_202_ACCEPTED)
+                return Response(
+                    {"message": "user is active"}, status=status.HTTP_202_ACCEPTED
+                )
         except Exception as e:
-            return Response({"message":"something went wrong"})
+            return Response({"message": "something went wrong"})
+
+
+class GetUserProfile(APIView):
+    def get(self, request, workspace_id):
+        try:
+            user_data = User.objects.get(id=request.user.id)
+            member_profile = WorkSpaceMembers.objects.get(
+                user_id=user_data.id, workspace_id=workspace_id
+            )
+        except Exception as e:
+            return Response(
+                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )

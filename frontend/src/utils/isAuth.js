@@ -7,7 +7,7 @@ const updateUserToken = async () => {
   const baseURL = process.env.REACT_APP_baseURL;
 
   try {
-    const res = await axios.post(`${baseURL}/user/token/refresh`, {
+    const res = await axios.post(`${baseURL}user/token/refresh`, {
       refresh: refreshToken,
     });
     if (res.status === 200) {

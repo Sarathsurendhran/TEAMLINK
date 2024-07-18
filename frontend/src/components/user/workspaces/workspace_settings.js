@@ -63,7 +63,7 @@ export default function WorkspaceSettings({ open, handleClose, fetchDataFunction
 
   const handleLaunch = async (id) => {
     dispatch(setWorkspaceId(id));
-    navigate(`/createworkspace/workspacehome`);
+    navigate(`/workspacehome`);
   };
 
   return (

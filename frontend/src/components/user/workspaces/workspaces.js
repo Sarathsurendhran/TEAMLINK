@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import logo from "../../../assets/logo.png";
-import avatar1 from "../../../assets/avatar1.svg";
 import axios from "axios";
-import "../../../style/style.css";
 import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setWorkspaceId } from "../../../Redux/WorkspaceID/workspaceSlice";
-
+import EastIcon from "@mui/icons-material/East";
+import SearchIcon from "@mui/icons-material/Search";
 
 const WorkSpaces = () => {
   const [workspaces, setWorkspaces] = useState([]);
   const [user, setUser] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const baseURL = process.env.REACT_APP_baseURL;
   const accessToken = localStorage.getItem("access");
   const navigate = useNavigate();
@@ -24,13 +25,7 @@ const WorkSpaces = () => {
   };
 
   useEffect(() => {
-    const fetechWorkspace = async () => {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-
+    const fetchWorkspaces = async () => {
       try {
         const res = await axios.get(
           `${baseURL}workspace/list-workspaces/`,
@@ -39,71 +34,122 @@ const WorkSpaces = () => {
 
         setWorkspaces(res.data.workspaces);
         setUser(res.data.user.email);
+        setFilteredData(res.data.workspaces);
       } catch (error) {
         console.log(error);
+        toast.error("Failed to fetch workspaces");
       }
     };
-    fetechWorkspace();
+
+    fetchWorkspaces();
   }, []);
 
   const handleLaunch = async (id) => {
     dispatch(setWorkspaceId(id));
-
     navigate(`/workspacehome`);
+  };
+
+  const handleLogout = (event) => {
+    event.preventDefault();
+    localStorage.clear();
+    window.location.reload();
+  };
+
+  // Function to handle input change
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    filterData(value);
+  };
+
+  // Function to filter data based on search term
+  const filterData = (term) => {
+    const filtered = workspaces.filter((item) =>
+      item.workspace_name.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredData(filtered);
   };
 
   return (
     <>
-      <div className="flex justify-center min-h-screen bg-white">
-        <div className="bg-white p-6  max-w-4xl w-full">
-          <div className="-ml-10">
-            <img src={logo} className="w-60 mx-auto" />
+      <div className="min-h-screen bg-white flex flex-col">
+        <header className="m-4 flex justify-between items-center p-4 rounded bg-white shadow-2xl border">
+          <div className="ml-8">
+            <img src={logo} className="w-40 mx-auto" alt="Logo" />
           </div>
-          <h2 className="text-center mb-2 mt-4 text-2xl md:text-4xl font-bold ">
-            Welcome back
-          </h2>
-          <p className="text-center mb-6  text-base">
-            Choose a workspace below to get back to working with your team.
-          </p>
+          <div className="flex space-x-4">
+            <Link to="/createworkspace">
+              <button className="px-2 py-2 bg-[#5d40fd] text-white rounded mr-2 transition cursor-pointer hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500">
+                Create another workspace
+              </button>
+            </Link>
+            <button
+              className="px-3 py-2 bg-red-600 text-white rounded mr-2 transition cursor-pointer hover:-translate-y-1 hover:scale-110 hover:bg-red-500"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
+        </header>
 
-          <div className="workspace w-full flex flex-col justify-center items-center ">
-            <h3 className="text-lg mb-2  font-bold">
-              Workspaces for {user ? user : " "}
+        <main className="flex-grow p-4">
+          <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+            <h2 className="text-center mb-1 text-2xl md:text-4xl font-bold">
+              Welcome back
+            </h2>
+            <p className="text-center mb-2 text-base">
+              Choose a workspace below to get back to working with your team.
+            </p>
+            <h3 className="text-center text-lg mb-2 font-bold">
+              Workspaces for {user ? user : ""}
             </h3>
 
-            <div className="w-full max-w-xl  overflow-y-auto scrollbar-hide ">
-              {workspaces.length > 0 ? (
-                workspaces.map((workspace, index) => (
+            <div className="flex justify-center items-center m-2">
+              <div className="relative w-96">
+                <input
+                  className="input pl-12 pr-4 rounded-full px-4 py-2 w-full border-2 border-gray-300 focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md"
+                  placeholder="Search..."
+                  required=""
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleInputChange}
+                />
+                <div className="absolute inset-y-0 left-3 flex items-center pl-3">
+                  <SearchIcon className="text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3">
+              {filteredData.length > 0 ? (
+                filteredData.map((workspace, index) => (
                   <div
                     key={index}
-                    className="w-full max-w-xl rounded-xl bg-[#7157FE] mb-2 mt-2 h-16 transition cursor-pointer hover:-translate-y-1.5 text-center flex items-center justify-center  hover:bg-indigo-500"
-                    onClick={() => handleLaunch(workspace.id)}
+                    className="w-full max-w-5xl rounded-lg bg-[#5d40fd] h-16 text-center flex items-center justify-between"
                   >
-                    <h1 className="text-2xl font-bold font-sans text-white">
+                    <h1 className="text-2xl font-bold ml-5 font-sans text-white">
                       {workspace.workspace_name}
-                    </h1>{" "}
+                    </h1>
+                    <button
+                      className="overflow-hidden relative w-32 p-2 h-12 mr-6 border border-blue-900 bg-[#0e7cf4] text-white rounded-md text-xl font-bold cursor-pointer relative z-10 group transform hover:scale-125"
+                      onClick={() => handleLaunch(workspace.id)}
+                    >
+                      Launch
+                      <span className="absolute w-36 h-32 -top-8 -left-2 bg-gray-300 rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
+                      <span className="absolute w-36 h-32 -top-8 -left-2 bg-red-500 rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
+                      <span className="absolute w-36 h-32 -top-8 -left-2 bg-red-600 rotate-12 transform scale-x-0 group-hover:scale-x-50 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
+                      <span className="absolute inset-0 text-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+                        <EastIcon />
+                      </span>
+                    </button>
                   </div>
                 ))
               ) : (
-                <p>NO workspaces</p>
+                <p className="text-center text-lg font-bold text-red-600">No workspaces found</p>
               )}
             </div>
-
-            <div className="w-full max-w-xl rounded-lg  flex justify-between items-center bg-gray-200 mb-2 mt-2 h-16 ">
-              <div>
-                <img src={avatar1} className="ml-2 w-16 mx-auto" />
-              </div>
-              <p className="text-xs  ml-4 sm:ml-0 md:text-base">
-                Want to use TeamLink with a different team?
-              </p>
-              <Link to="/createworkspace">
-              <button className="px-2 py-2  bg-[#7157FE]  text-white rounded-lg  mr-2  transition cursor-pointer hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500">
-                Create another workspace
-              </button>
-              </Link>
-            </div>
           </div>
-        </div>
+        </main>
       </div>
     </>
   );

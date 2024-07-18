@@ -1,5 +1,6 @@
 from django.db import models
 from workspaces.models import WorkSpaces, WorkSpaceMembers
+from users.models import User
 from django.utils import timezone
 
 
@@ -7,10 +8,11 @@ class WorkspaceGroups(models.Model):
     group_name = models.CharField(max_length=100, null=True)
     description = models.CharField(max_length=200, null=True)
     is_private = models.BooleanField(default=False)
+    topic = models.CharField(max_length=200, null=True)
     created_by = models.ForeignKey(
-        WorkSpaceMembers, on_delete=models.SET_NULL, null=True
+        User, on_delete=models.SET_NULL, null=True
     )
-    workspace_name = models.ForeignKey(WorkSpaces, on_delete=models.CASCADE)
+    workspace = models.ForeignKey(WorkSpaces, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:

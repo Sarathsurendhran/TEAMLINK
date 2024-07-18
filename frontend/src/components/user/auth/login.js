@@ -20,6 +20,16 @@ const Login = () => {
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    if (!email){
+      toast.warning("Email Cannot Be Empty!")
+      return false
+    }
+
+    if (!password){
+      toast.warning("Password Cannot Be Empty!")
+      return false
+    }
+
     if (!emailPattern.test(email)) {
       toast.warning("Invalid Email Format");
       return false;

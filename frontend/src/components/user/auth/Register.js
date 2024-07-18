@@ -17,6 +17,19 @@ const Register = () => {
     let email = e.target.email.value;
     let password = e.target.password.value;
 
+    if (!username){
+      toast.warning("Username Cannot Be Empty!")
+      return false
+    }
+    if (!email){
+      toast.warning("Email Cannot Be Empty!")
+      return false
+    }
+    if (!password){
+      toast.warning("Password Cannot Be Empty!")
+      return false
+    }
+
     if (username.length <= 3) {
       toast.warning("Username should have at least 4 characters");
       return false;

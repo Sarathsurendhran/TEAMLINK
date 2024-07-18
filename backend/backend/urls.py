@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin-login/', admin.site.urls),
     path('user/', include('users.api.urls')),
     path('workspace/', include('workspaces.api.urls')),
-    path('admin/', include('admin_side.api.urls'))
+    path('admin/', include('admin_side.api.urls')),
+    path('group/', include('group_chat.api.urls')),
 ]
