@@ -28,7 +28,7 @@ const CreateWorkSpace = () => {
 
     const formData = new FormData();
     formData.append("workspace_name", workspace_name);
-    formData.append("workspace_description", workspace_description);
+    formData.append("description", workspace_description);
 
     try {
       const access_token = localStorage.getItem("access");

@@ -6,7 +6,7 @@ from workspaces.models import WorkSpaceMembers, WorkSpaces
 class WorkSpaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkSpaces
-        exclude = ["created_by", "description"]
+        exclude = ["created_by"]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -69,7 +69,7 @@ class WorkSpaceSerializerForWorkspace(serializers.ModelSerializer):
         model = WorkSpaces
         fields = "__all__"
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation["workspace_name"] = representation["workspace_name"].upper()
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation["workspace_name"] = representation["workspace_name"].upper()
+    #     return representation

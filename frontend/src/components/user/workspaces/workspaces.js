@@ -4,9 +4,10 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setWorkspaceId } from "../../../Redux/WorkspaceID/workspaceSlice";
+import { setWorkspaceId, setWorkspaceName } from "../../../Redux/WorkspaceID/workspaceSlice";
 import EastIcon from "@mui/icons-material/East";
 import SearchIcon from "@mui/icons-material/Search";
+import "../../../style/style.css";
 
 const WorkSpaces = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -44,8 +45,9 @@ const WorkSpaces = () => {
     fetchWorkspaces();
   }, []);
 
-  const handleLaunch = async (id) => {
+  const handleLaunch = async (id, name) => {
     dispatch(setWorkspaceId(id));
+    dispatch(setWorkspaceName(name))
     navigate(`/workspacehome`);
   };
 
@@ -72,10 +74,12 @@ const WorkSpaces = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-white flex flex-col">
-        <header className="m-4 flex justify-between items-center p-4 rounded bg-white shadow-2xl border">
+      <div className="min-h-screen bg-blue-300 flex flex-col">
+        <header className="m-2 flex justify-between items-center p-4 rounded-lg bg-blue-200 ">
           <div className="ml-8">
-            <img src={logo} className="w-40 mx-auto" alt="Logo" />
+            {/* <img src={logo} className="w-40 mx-auto" alt="Logo" /> */}
+            <h2 className="text-3xl text-[#5d40fd] font-bold">TeamLink</h2>
+            <span className="text-[#5d40fd] ">WORK SMARTER TOGETHER</span>
           </div>
           <div className="flex space-x-4">
             <Link to="/createworkspace">
@@ -92,9 +96,9 @@ const WorkSpaces = () => {
           </div>
         </header>
 
-        <main className="flex-grow p-4">
-          <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-            <h2 className="text-center mb-1 text-2xl md:text-4xl font-bold">
+        <main className="flex-grow ">
+          <div className="max-w-4xl mx-auto bg-blue-300  p-6 rounded ">
+            <h2 className="text-center mb-1 text-2xl md:text-6xl font-bold font-serif">
               Welcome back
             </h2>
             <p className="text-center mb-2 text-base">
@@ -107,7 +111,7 @@ const WorkSpaces = () => {
             <div className="flex justify-center items-center m-2">
               <div className="relative w-96">
                 <input
-                  className="input pl-12 pr-4 rounded-full px-4 py-2 w-full border-2 border-gray-300 focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md"
+                  className="input pl-12 pr-4 rounded-full px-4 py-2 bg-blue-100 w-full border-2 border-gray-300 focus:outline-none focus:border-blue-500 placeholder-gray-400 transition-all duration-300 shadow-md"
                   placeholder="Search..."
                   required=""
                   type="text"
@@ -120,19 +124,26 @@ const WorkSpaces = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-600 hover:scrollbar-track-gray-200">
               {filteredData.length > 0 ? (
                 filteredData.map((workspace, index) => (
                   <div
                     key={index}
-                    className="w-full max-w-5xl rounded-lg bg-[#5d40fd] h-16 text-center flex items-center justify-between"
+                    className="w-full max-w-5xl p-3 rounded-lg bg-[#5d40fd] h-auto text-center flex items-start justify-between"
                   >
-                    <h1 className="text-2xl font-bold ml-5 font-sans text-white">
-                      {workspace.workspace_name}
-                    </h1>
+                    <div className="flex flex-col items-start text-left p-2 max-w-xl ">
+                      <h1 className="text-2xl font-bold font-sans text-white">
+                        {workspace.workspace_name}
+                      </h1>
+
+                      <h2 className="text-xl text-white">
+                        {workspace.description}
+                      </h2>
+                    </div>
+
                     <button
-                      className="overflow-hidden relative w-32 p-2 h-12 mr-6 border border-blue-900 bg-[#0e7cf4] text-white rounded-md text-xl font-bold cursor-pointer relative z-10 group transform hover:scale-125"
-                      onClick={() => handleLaunch(workspace.id)}
+                      className="overflow-hidden  w-32 p-2 h-12 mr-6 border border-blue-900 bg-[#0e7cf4] text-white rounded-md text-xl font-bold cursor-pointer relative z-10 group transform hover:scale-125"
+                      onClick={() => handleLaunch(workspace.id, workspace.workspace_name)}
                     >
                       Launch
                       <span className="absolute w-36 h-32 -top-8 -left-2 bg-gray-300 rotate-12 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
@@ -145,7 +156,9 @@ const WorkSpaces = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-center text-lg font-bold text-red-600">No workspaces found</p>
+                <p className="text-center text-lg font-bold text-red-600">
+                  No workspaces found
+                </p>
               )}
             </div>
           </div>

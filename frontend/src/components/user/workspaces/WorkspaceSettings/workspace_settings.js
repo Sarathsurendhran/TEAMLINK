@@ -7,10 +7,10 @@ import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setWorkspaceId } from "../../../Redux/WorkspaceID/workspaceSlice";
+import { setWorkspaceId } from "../../../../Redux/WorkspaceID/workspaceSlice";
 import axios from "axios";
 import { Button } from "@mui/material";
-import ChildModal from "./workspace_user_settings"
+import ChildModal from "../workspace_user_settings"
 
 const style = {
   position: "absolute",

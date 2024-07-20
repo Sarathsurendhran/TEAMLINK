@@ -32,44 +32,7 @@ function ChildModal({fetchDataFunction}) {
     ? authenticated_user.id
     : null;
 
-  const [menuItems, setMenuItems] = useState([]);
-  const [workspaceAdmin, setWorkspaceAdmin] = useState()
 
-  // feteching all the data of the current workspace and user
-
-  useEffect(() => {
-    try {
-      fetchData();
-    } catch (error) {}
-  }, [workspaceID]);
-
-  const fetchData = async () => {
-    const accessToken = localStorage.getItem("access");
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
-
-    try {
-      const res = await axios.get(
-        `${baseURL}workspace/workspace-home/${workspaceID}/`,
-        config
-      );
-      if (res.status === 200) {
-        // toast.success(res.data.message);
-        setWorkspaceAdmin(res.data.workspace_data.created_by)
-    
-
-        const members_data = res.data.members_data;
-        const members = Array.isArray(members_data) ? members_data : [];
-        setMenuItems(members);
-        
-      }
-    } catch (error) {
-      console.error("Error launching workspace:", error);
-    }
-  };
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => {
@@ -79,30 +42,6 @@ function ChildModal({fetchDataFunction}) {
     setOpen(false);
   };
 
-  //remove member
-  const removeMember = async (user_id) => {
-    const accessToken = localStorage.getItem("access");
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
-
-    try {
-      const res = await axios.post(
-        `${baseURL}workspace/remove-user/`,
-        { user_id, workspaceID },
-        config
-      );
-      if (res.status === 200) {
-        fetchData();
-        toast.success(res.data.message);
-        fetchDataFunction() // For triggering sidebar 
-      }
-    } catch (error) {
-      console.error("Error removing user:", error);
-    }
-  };
 
   return (
     <React.Fragment>

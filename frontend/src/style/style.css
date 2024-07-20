@@ -12,7 +12,7 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #fffafa; /* Color of the track */
+  background: rgb(191 219 254); /* Color of the track */
 }
 
 /* Handle */
