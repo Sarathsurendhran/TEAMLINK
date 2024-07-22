@@ -23,6 +23,8 @@ import "./WorkSpaceTabStyle.css";
 
 import ConfirmMessageModal from "../../../ConfirmMessageModals/RemoveUser";
 
+import CreateWorkspaceModal from "./CreateWorkspaceModal";
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -71,7 +73,8 @@ export default function WorkSpaceTabs() {
 
   const [workspaces, setWorkspaces] = useState([]);
   const [currentWorkspace, setCurrentWorkspace] = useState([]);
-  const [currentWorkspaceCreaterName, setCurrentWorkspceCreaterName] = useState()
+  const [currentWorkspaceCreaterName, setCurrentWorkspceCreaterName] =
+    useState();
   const [user, setUser] = useState(null);
   const baseURL = process.env.REACT_APP_baseURL;
   const accessToken = localStorage.getItem("access");
@@ -123,7 +126,7 @@ export default function WorkSpaceTabs() {
     try {
       fetchData();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }, [workspaceID]);
 
@@ -148,7 +151,7 @@ export default function WorkSpaceTabs() {
         setCurrentWorkspace(res.data.workspace_data);
         setCurrentWorkspaceName(res.data.workspace_data.workspace_name);
         setDescription(res.data.workspace_data.description);
-        setCurrentWorkspceCreaterName(res.data.user_name)
+        setCurrentWorkspceCreaterName(res.data.user_name);
 
         const members_data = res.data.members_data;
         const members = Array.isArray(members_data) ? members_data : [];
@@ -227,7 +230,7 @@ export default function WorkSpaceTabs() {
       if (res.status === 200) {
         toast.success("Workspace Name Updated Sucessfully");
         fetchData();
-        fetechWorkspace()
+        fetechWorkspace();
         dispatch(setWorkspaceName(currentWorkspaceName));
       } else {
         toast.error("Something went wrong");
@@ -254,8 +257,8 @@ export default function WorkSpaceTabs() {
       );
       if (response.status === 200) {
         toast.success(response.data.message);
-        fetchData()
-        fetechWorkspace()
+        fetchData();
+        fetechWorkspace();
       } else {
         toast.error("Something went wrong");
       }
@@ -326,9 +329,7 @@ export default function WorkSpaceTabs() {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-black bg-gray-200  leading-tight focus:outline-none focus:shadow-outline"
                 />
               ) : (
-                <span className="text-lg ">
-                  {currentWorkspaceName}
-                </span>
+                <span className="text-lg ">{currentWorkspaceName}</span>
               )}
             </div>
             <div className="mb-3">
@@ -397,7 +398,12 @@ export default function WorkSpaceTabs() {
           index={1}
           dir={theme.direction}
         >
-          <div className="flex flex-col items-center max-h-96 w-full  max-w-xl overflow-y-auto custom-scrollbar">
+          <div className="flex justify-center items-center mb-3">
+            {/* create workspace modal */}
+            <CreateWorkspaceModal fetechWorkspace={fetechWorkspace} />
+          </div>
+
+          <div className="flex flex-col items-center max-h-80 w-full  max-w-xl overflow-y-auto custom-scrollbar">
             {filteredWorkspaces.length > 0 ? (
               filteredWorkspaces.map((workspace, index) => (
                 <div

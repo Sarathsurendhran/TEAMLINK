@@ -1,16 +1,12 @@
-import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
 import LogoutIcon from "@mui/icons-material/Logout";
 import UserProfile from "../user_profile/UserProfile";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import CreateGroupModal from "../Group/CreateGroup";
 import WorkSpaceUserList from "./WorkSpaceUserList/WorkSpaceUserList";
 import WorkspacesGroups from "./WorkspaceGroups/WorkspacesGroups";
 import WorkspaceAddUsers from "./WorkspaceAddUsers/WorkspaceAddUsers";
 import WorkspaceSettingsModal from "./WorkspaceSettings/WorkspaceSettingsModal";
+import PrivateRoutes from "../../private_routes/private_routes";
 
 const WorkspaceSidebar = () => {
   // ...............................handiling logout......................................
@@ -131,8 +127,8 @@ const WorkspaceSidebar = () => {
               <WorkspaceSettings />
             </div> */}
 
-            <WorkspaceSettingsModal/>
-
+              <WorkspaceSettingsModal />
+            
             <nav
               className="hs-accordion-group p-6 w-full flex flex-col flex-wrap"
               data-hs-accordion-always-open=""

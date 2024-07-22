@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { Suspense, lazy } from "react";
 
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
@@ -11,6 +11,7 @@ import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 
 import WorkSpaceTabs from "./WorkSpaceTabs";
 import { useSelector } from "react-redux";
+import PrivateRoutes from "../../../private_routes/private_routes";
 
 const WorkspaceSettingsModal = () => {
   const [open, setOpen] = React.useState(false);
@@ -82,7 +83,9 @@ const WorkspaceSettingsModal = () => {
             </Typography>
 
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              <WorkSpaceTabs />
+              <PrivateRoutes>
+                <WorkSpaceTabs />
+              </PrivateRoutes>
             </Typography>
           </Box>
         </Fade>
