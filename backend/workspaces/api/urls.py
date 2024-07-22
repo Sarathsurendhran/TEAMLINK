@@ -9,5 +9,5 @@ urlpatterns = [
   path('remove-user/', views.RemoveUser.as_view(), name='remove-user/'),
   path('check-isblocked/<int:workspace_id>', views.CheckIsBlocked.as_view(), name='check-isblocked/'),
   path('update-workspace-name/', views.UpdateWorkspaceName.as_view(), name='update-workspace-name/'),
-  # path('update-workspace-description/', views.UpdateWorkspaceDescription.as_view(), name='update-workspace-description/'),
+  path('update-workspace-description/', views.UpdateWorkspaceDescription.as_view(), name='update-workspace-description/'),
 ]

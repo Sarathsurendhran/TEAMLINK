@@ -11,6 +11,7 @@ from workspaces.api.serializers import (
     UserSerializer,
     WorkspaceMemberSerializer,
     UpdateWorkspaceNameSerializer,
+    UpdateWorkspaceDescrptionSerializer,
 )
 from rest_framework.permissions import IsAuthenticated
 from workspaces.send_invitation import send_invitation
@@ -146,11 +147,18 @@ class WorkSpaceHome(APIView):
             workspace_serializer = WorkSpaceSerializerForWorkspace(workspace)
             member_serializer = WorkspaceMemberSerializer(workspace_members, many=True)
 
+            try:
+                user_name = User.objects.get(id=workspace.created_by.id)
+
+            except Exception as e:
+                print("error", e)
+
             return Response(
                 {
                     "message": "Success",
                     "workspace_data": workspace_serializer.data,
                     "members_data": member_serializer.data,
+                    "user_name":user_name.username
                 },
                 status=status.HTTP_200_OK,
             )
@@ -212,5 +220,32 @@ class UpdateWorkspaceName(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class UpdateWorkspaceDescription(APIView):
-#     def put(self, request):
+class UpdateWorkspaceDescription(APIView):
+    def put(self, request):
+        serializer = UpdateWorkspaceDescrptionSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                workspace = WorkSpaces.objects.get(
+                    id=serializer.validated_data["workspace_id"]
+                )
+                workspace.description = serializer.validated_data[
+                    "workspace_description"
+                ]
+                workspace.save()
+                return Response(
+                    {"message": "Worspace Description Updated Sucessfully"},
+                    status=status.HTTP_200_OK,
+                )
+            except WorkSpaces.DoesNotExist:
+                return Response(
+                    {"message": "Workspace not found"}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            except Exception as e:
+                return Response(
+                    {"message": "An unexpected error occurred"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

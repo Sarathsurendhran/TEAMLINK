@@ -78,3 +78,8 @@ class WorkSpaceSerializerForWorkspace(serializers.ModelSerializer):
 class UpdateWorkspaceNameSerializer(serializers.Serializer):
     workspace_id = serializers.IntegerField()
     workspace_name = serializers.CharField(max_length=100)
+
+
+class UpdateWorkspaceDescrptionSerializer(serializers.Serializer):
+    workspace_id = serializers.IntegerField()
+    workspace_description = serializers.CharField(max_length=300)

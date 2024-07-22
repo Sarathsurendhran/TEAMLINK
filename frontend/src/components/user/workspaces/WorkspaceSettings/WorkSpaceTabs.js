@@ -71,6 +71,7 @@ export default function WorkSpaceTabs() {
 
   const [workspaces, setWorkspaces] = useState([]);
   const [currentWorkspace, setCurrentWorkspace] = useState([]);
+  const [currentWorkspaceCreaterName, setCurrentWorkspceCreaterName] = useState()
   const [user, setUser] = useState(null);
   const baseURL = process.env.REACT_APP_baseURL;
   const accessToken = localStorage.getItem("access");
@@ -91,35 +92,39 @@ export default function WorkSpaceTabs() {
 
   // Fetching Workspaces.....................
   useEffect(() => {
-    const fetechWorkspace = async () => {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-
-      try {
-        const res = await axios.get(
-          `${baseURL}workspace/list-workspaces/`,
-          config
-        );
-
-        setWorkspaces(res.data.workspaces);
-        setUser(res.data.user.email);
-      } catch (error) {
-        console.log(error);
-      }
-    };
     fetechWorkspace();
   }, [workspaceID]);
+
+  const fetechWorkspace = async () => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    try {
+      const res = await axios.get(
+        `${baseURL}workspace/list-workspaces/`,
+        config
+      );
+
+      setWorkspaces(res.data.workspaces);
+      setUser(res.data.user.email);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // feteching all the data of the current workspace and user
   const [menuItems, setMenuItems] = useState([]);
   const [isWorkspaceAdmin, setIsWorkspaceAdmin] = useState(false);
+
   useEffect(() => {
     try {
       fetchData();
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }, [workspaceID]);
 
   const fetchData = async () => {
@@ -143,6 +148,7 @@ export default function WorkSpaceTabs() {
         setCurrentWorkspace(res.data.workspace_data);
         setCurrentWorkspaceName(res.data.workspace_data.workspace_name);
         setDescription(res.data.workspace_data.description);
+        setCurrentWorkspceCreaterName(res.data.user_name)
 
         const members_data = res.data.members_data;
         const members = Array.isArray(members_data) ? members_data : [];
@@ -221,6 +227,7 @@ export default function WorkSpaceTabs() {
       if (res.status === 200) {
         toast.success("Workspace Name Updated Sucessfully");
         fetchData();
+        fetechWorkspace()
         dispatch(setWorkspaceName(currentWorkspaceName));
       } else {
         toast.error("Something went wrong");
@@ -247,6 +254,8 @@ export default function WorkSpaceTabs() {
       );
       if (response.status === 200) {
         toast.success(response.data.message);
+        fetchData()
+        fetechWorkspace()
       } else {
         toast.error("Something went wrong");
       }
@@ -292,7 +301,7 @@ export default function WorkSpaceTabs() {
                 className="block text-sm font-bold mb-1"
                 htmlFor="workspaceName"
               >
-                <span className="text-base mb-3">Workspace Name</span>
+                <span className="text-lg mb-3">Workspace Name</span>
                 <button className="ml-2 text-base" onClick={handleNameEdit}>
                   {isNameEditing ? (
                     <button
@@ -317,7 +326,7 @@ export default function WorkSpaceTabs() {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-black bg-gray-200  leading-tight focus:outline-none focus:shadow-outline"
                 />
               ) : (
-                <span className="text-lg font-bold">
+                <span className="text-lg ">
                   {currentWorkspaceName}
                 </span>
               )}
@@ -327,7 +336,7 @@ export default function WorkSpaceTabs() {
                 className="block text-sm font-bold mb-1"
                 htmlFor="description"
               >
-                <span className="text-base">Description</span>
+                <span className="text-lg">Description</span>
 
                 <button
                   className="ml-2 text-base"
@@ -359,18 +368,18 @@ export default function WorkSpaceTabs() {
             </div>
             <div className="mb-2">
               <label
-                className="block text-base font-bold mb-1"
+                className="block text-lg font-bold mb-1  text-gray-100"
                 htmlFor="createdBy"
               >
                 Created By
               </label>
               <hr className="mb-3" />
 
-              <span className="mb-2 mt-2">{currentWorkspace.created_by}</span>
+              <span className="mb-2 mt-2">{currentWorkspaceCreaterName}</span>
             </div>
             <div className="mb-2">
               <label
-                className="block text-base font-bold mb-2"
+                className="block text-lg font-bold mb-2"
                 htmlFor="createdOn"
               >
                 Created On
