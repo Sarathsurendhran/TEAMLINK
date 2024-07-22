@@ -29,17 +29,8 @@ export default function ConfirmMessageModal({ removeMember }) {
 
   return (
     <div>
-      <Typography
-        component="div"
-        onClick={handleOpen}
-        sx={{
-          fontSize: "0.75rem",
-          color: "white",
-          cursor: "pointer",
-        }}
-      >
-        Remove
-      </Typography>
+  
+      <button className="text-white bg-red-500 hover:bg-red-700 text-sm p-1 rounded" onClick={handleOpen}>Remove</button>
 
       <Modal
         open={open}

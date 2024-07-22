@@ -59,7 +59,7 @@ class WorkspaceMemberSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def to_representation(self, instance):
-        if instance.is_active:  
+        if instance.is_active:
             return super().to_representation(instance)
         return None
 
@@ -73,3 +73,8 @@ class WorkSpaceSerializerForWorkspace(serializers.ModelSerializer):
     #     representation = super().to_representation(instance)
     #     representation["workspace_name"] = representation["workspace_name"].upper()
     #     return representation
+
+
+class UpdateWorkspaceNameSerializer(serializers.Serializer):
+    workspace_id = serializers.IntegerField()
+    workspace_name = serializers.CharField(max_length=100)

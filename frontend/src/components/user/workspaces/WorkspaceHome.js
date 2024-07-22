@@ -1,6 +1,6 @@
 import React from "react";
-import WorkspaceHeader from "./workspace_header";
-import WorkspaceSidebar from "./workspace_sidebar";
+import WorkspaceHeader from "./WorkspaceHeader";
+import WorkspaceSidebar from "./WorkspaceSidebar";
 import { Outlet } from "react-router-dom";
 import WorkspaceInnerHeader from "./WorkspaceInnerHeader";
 

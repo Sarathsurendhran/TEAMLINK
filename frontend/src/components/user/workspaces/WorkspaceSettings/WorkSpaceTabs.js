@@ -8,6 +8,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -69,6 +70,7 @@ export default function WorkSpaceTabs() {
   };
 
   const [workspaces, setWorkspaces] = useState([]);
+  const [currentWorkspace, setCurrentWorkspace] = useState([]);
   const [user, setUser] = useState(null);
   const baseURL = process.env.REACT_APP_baseURL;
   const accessToken = localStorage.getItem("access");
@@ -113,7 +115,7 @@ export default function WorkSpaceTabs() {
 
   // feteching all the data of the current workspace and user
   const [menuItems, setMenuItems] = useState([]);
-  const [workspaceAdmin, setWorkspaceAdmin] = useState();
+  const [isWorkspaceAdmin, setIsWorkspaceAdmin] = useState(false);
   useEffect(() => {
     try {
       fetchData();
@@ -125,6 +127,7 @@ export default function WorkSpaceTabs() {
     const config = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
     };
 
@@ -135,7 +138,11 @@ export default function WorkSpaceTabs() {
       );
       if (res.status === 200) {
         // toast.success(res.data.message);
-        setWorkspaceAdmin(res.data.workspace_data.created_by);
+        setIsWorkspaceAdmin(res.data.members_data.is_admin);
+
+        setCurrentWorkspace(res.data.workspace_data);
+        setCurrentWorkspaceName(res.data.workspace_data.workspace_name);
+        setDescription(res.data.workspace_data.description);
 
         const members_data = res.data.members_data;
         const members = Array.isArray(members_data) ? members_data : [];
@@ -146,7 +153,7 @@ export default function WorkSpaceTabs() {
     }
   };
 
-  const handleLaunch = async (id, name) => {
+  const handleLaunch = (id, name) => {
     dispatch(setWorkspaceId(id));
     dispatch(setWorkspaceName(name));
     navigate(`/workspacehome`);
@@ -180,6 +187,78 @@ export default function WorkSpaceTabs() {
     }
   };
 
+  const [isDescriptionEditing, setIsDescriptionEditing] = useState(false);
+  const [isNameEditing, setIsNameEditing] = useState(false);
+  const [currentWorkspaceName, setCurrentWorkspaceName] = useState();
+  const [description, setDescription] = useState();
+
+  const handleDescriptionEdit = () => {
+    setIsDescriptionEditing(!isDescriptionEditing);
+  };
+
+  const handleNameEdit = () => {
+    setIsNameEditing(!isNameEditing);
+  };
+
+  const handleWorkspaceNameChange = (e) => {
+    setCurrentWorkspaceName(e.target.value);
+  };
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
+  };
+
+  const changeWorkspaceName = async () => {
+    const data = {
+      workspace_name: currentWorkspaceName,
+      workspace_id: workspaceID,
+    };
+    try {
+      const res = await axios.put(
+        `${baseURL}workspace/update-workspace-name/`,
+        data,
+        config
+      );
+      if (res.status === 200) {
+        toast.success("Workspace Name Updated Sucessfully");
+        fetchData();
+        dispatch(setWorkspaceName(currentWorkspaceName));
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        toast.error("Error: " + JSON.stringify(error.response.data));
+      } else {
+        console.error("An unexpected error occurred", error);
+      }
+    }
+  };
+
+  const ChangeWorksapceDescription = async () => {
+    const data = {
+      workspace_description: description,
+      workspace_id: workspaceID,
+    };
+    try {
+      const response = await axios.put(
+        `${baseURL}workspace/update-workspace-description/`,
+        data,
+        config
+      );
+      if (response.status === 200) {
+        toast.success(response.data.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        toast.error(JSON.stringify(error.response.data));
+      } else {
+        console.error("An unexpected error occurred", error);
+      }
+    }
+  };
+
   return (
     <Box sx={{ bgcolor: "#323232", width: 550 }}>
       <AppBar position="static" sx={{ bgcolor: "#323232" }}>
@@ -207,9 +286,102 @@ export default function WorkSpaceTabs() {
           index={0}
           dir={theme.direction}
         >
-          Item One
+          <div className="mt-3 max-w-lg mx-auto text-gray-300">
+            <div className="mb-4">
+              <label
+                className="block text-sm font-bold mb-1"
+                htmlFor="workspaceName"
+              >
+                <span className="text-base mb-3">Workspace Name</span>
+                <button className="ml-2 text-base" onClick={handleNameEdit}>
+                  {isNameEditing ? (
+                    <button
+                      className="text-base bg-blue-700 p-2 rounded"
+                      onClick={changeWorkspaceName}
+                    >
+                      Submit
+                    </button>
+                  ) : (
+                    <EditNoteIcon />
+                  )}
+                </button>
+              </label>
+
+              <hr className="mb-3" />
+              {isNameEditing ? (
+                <input
+                  type="text"
+                  id="workspaceName"
+                  value={currentWorkspaceName}
+                  onChange={handleWorkspaceNameChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-black bg-gray-200  leading-tight focus:outline-none focus:shadow-outline"
+                />
+              ) : (
+                <span className="text-lg font-bold">
+                  {currentWorkspaceName}
+                </span>
+              )}
+            </div>
+            <div className="mb-3">
+              <label
+                className="block text-sm font-bold mb-1"
+                htmlFor="description"
+              >
+                <span className="text-base">Description</span>
+
+                <button
+                  className="ml-2 text-base"
+                  onClick={handleDescriptionEdit}
+                >
+                  {isDescriptionEditing ? (
+                    <button
+                      className="text-base bg-blue-700 p-2 rounded"
+                      onClick={ChangeWorksapceDescription}
+                    >
+                      Submit
+                    </button>
+                  ) : (
+                    <EditNoteIcon />
+                  )}
+                </button>
+              </label>
+              <hr className="mb-3" />
+              {isDescriptionEditing ? (
+                <textarea
+                  id="description"
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  className="shadow appearance-none border rounded w-full py-5 px-3 bg-gray-200 text-black leading-tight focus:outline-none focus:shadow-outline"
+                />
+              ) : (
+                <span>{description}</span>
+              )}
+            </div>
+            <div className="mb-2">
+              <label
+                className="block text-base font-bold mb-1"
+                htmlFor="createdBy"
+              >
+                Created By
+              </label>
+              <hr className="mb-3" />
+
+              <span className="mb-2 mt-2">{currentWorkspace.created_by}</span>
+            </div>
+            <div className="mb-2">
+              <label
+                className="block text-base font-bold mb-2"
+                htmlFor="createdOn"
+              >
+                Created On
+              </label>
+              <hr className="mb-3" />
+              <span className="mb-2 mt-2">{currentWorkspace.created_on}</span>
+            </div>
+          </div>
         </TabPanel>
 
+        {/* Workspaces Tabpanel */}
         <TabPanel
           className="text-white"
           value={value}
@@ -237,6 +409,7 @@ export default function WorkSpaceTabs() {
           </div>
         </TabPanel>
 
+        {/* Users Tabpanel */}
         <TabPanel
           className="text-white"
           value={value}
@@ -259,15 +432,11 @@ export default function WorkSpaceTabs() {
                   )}
                 </div>
                 {!member.is_admin &&
-                  member.user.id !== authenticated_user_id && (
-                    <button
-                      className="text-white bg-red-500 hover:bg-red-700 p-1 rounded"
-                      // onClick={() => removeMember(member.user.id)}
-                    >
-                      <ConfirmMessageModal
-                        removeMember={() => removeMember(member.user.id)}
-                      />
-                    </button>
+                  member.user.id !== authenticated_user_id &&
+                  isWorkspaceAdmin && (
+                    <ConfirmMessageModal
+                      removeMember={() => removeMember(member.user.id)}
+                    />
                   )}
               </li>
             ))}

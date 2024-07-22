@@ -12,7 +12,6 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 
-
 const style = {
   position: "absolute",
   top: "50%",
@@ -20,14 +19,14 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: "100%",
   maxWidth: "400px",
-  bgcolor: "background.paper",
+  bgcolor: "#1e293b", // dark background color
+  color: "#fff", // white text color
   boxShadow: 24,
   p: 4,
   borderRadius: "8px",
 };
 
 export default function WorkspaceAddUsers() {
-  
   const baseURL = process.env.REACT_APP_baseURL;
   const navigate = useNavigate();
   const workspaceID = useSelector((state) => state.workspace.workspaceId);
@@ -36,10 +35,6 @@ export default function WorkspaceAddUsers() {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-
-  
-
 
   //........................................send invitation..................................
   const handleSubmit = async (e) => {
@@ -68,11 +63,10 @@ export default function WorkspaceAddUsers() {
       if (res.status === 200) {
         setLoading(false);
         toast.success(res.data.message);
-      
       }
     } catch (error) {
       setLoading(false);
-      
+
       if (error.response && error.response.data && error.response.data.email) {
         toast.warning(error.response.data.email[0]);
       } else if (error.response.data.non_field_errors) {
@@ -110,71 +104,65 @@ export default function WorkspaceAddUsers() {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-              {/* Modal header */}
-              <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                <Typography
-                  variant="h6"
-                  component="h3"
-                  className="text-gray-900 dark:text-white"
+            {/* Modal header */}
+            <div className="flex items-center justify-between p-4 md:p-5 border-b border-gray-600 rounded-t">
+              <Typography variant="h6" component="h3" className="text-white">
+                Add Members
+              </Typography>
+              <Button
+                type="button"
+                className="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                onClick={handleClose}
+              >
+                <svg
+                  className="w-3 h-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 14"
                 >
-                  Add Members
-                </Typography>
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                  />
+                </svg>
+
+                <span className="sr-only">Close modal</span>
+              </Button>
+            </div>
+            {/* Modal body */}
+            <div className="p-4 md:p-5">
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block mb-2 text-sm font-medium text-white"
+                  >
+                    Add email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    className="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+                    placeholder="name@company.com"
+                    required
+                  />
+                </div>
+
                 <Button
-                  type="button"
-                  className="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                  onClick={handleClose}
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                 >
-                  <svg
-                    className="w-3 h-3"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 14 14"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                    />
-                  </svg>
-
-                  <span className="sr-only">Close modal</span>
+                  Send Invitation
                 </Button>
-              </div>
-              {/* Modal body */}
-              <div className="p-4 md:p-5">
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Add email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      id="email"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                      placeholder="name@company.com"
-                      required
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                  >
-                    Send Invitation
-                  </Button>
-                </form>
-              </div>
+              </form>
             </div>
           </Box>
         </Fade>

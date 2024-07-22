@@ -10,6 +10,7 @@ from workspaces.api.serializers import (
     WorkSpaceSerializerForWorkspace,
     UserSerializer,
     WorkspaceMemberSerializer,
+    UpdateWorkspaceNameSerializer,
 )
 from rest_framework.permissions import IsAuthenticated
 from workspaces.send_invitation import send_invitation
@@ -179,3 +180,37 @@ class CheckIsBlocked(APIView):
             return Response(
                 {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class UpdateWorkspaceName(APIView):
+    def put(self, request):
+
+        serializer = UpdateWorkspaceNameSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                workspace = WorkSpaces.objects.get(
+                    id=serializer.validated_data["workspace_id"]
+                )
+                workspace.workspace_name = serializer.validated_data["workspace_name"]
+                workspace.save()
+                return Response(
+                    {"message": "Worspace Name Updated Sucessfully"},
+                    status=status.HTTP_200_OK,
+                )
+            except WorkSpaces.DoesNotExist:
+                return Response(
+                    {"message": "Workspace not found"}, status=status.HTTP_404_NOT_FOUND
+                )
+
+            except Exception as e:
+                return Response(
+                    {"message": "An unexpected error occurred"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class UpdateWorkspaceDescription(APIView):
+#     def put(self, request):

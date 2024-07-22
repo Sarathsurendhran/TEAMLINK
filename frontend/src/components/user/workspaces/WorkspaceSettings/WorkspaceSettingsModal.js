@@ -74,7 +74,7 @@ const WorkspaceSettingsModal = () => {
           <Box sx={style}>
             <Typography
               id="transition-modal-title"
-              className="bg-white h-24"
+              className="bg-white h-14"
               variant="h6"
               component="h2"
             >

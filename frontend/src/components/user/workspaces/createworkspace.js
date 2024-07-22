@@ -4,7 +4,7 @@ import worklife from "../../../assets/worklife.webp";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import WorkspaceHome from "./workspace_home";
+import WorkspaceHome from "./WorkspaceHome";
 
 const CreateWorkSpace = () => {
   const baseURL = process.env.REACT_APP_baseURL;
