@@ -25,7 +25,7 @@ const style = {
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
-export default function CreateGroupModal({ open, close, fetchGroupsData }) { 
+export default function CreateGroupModal({ open, close, fetchGroupsData }) {
   const [isPrivate, setIsPrivate] = useState(false);
   const WorkspaceID = useSelector((state) => state.workspace.workspaceId);
   const authenticated_user = useSelector((state) => state.authenticationUser);
@@ -42,15 +42,15 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
 
     // Check if group_name is not empty
     if (!group_name) {
-      toast.warning("Group Name cannot be empty!")
+      toast.warning("Group Name cannot be empty!");
       return false; // Validation failed
     }
     if (!group_description) {
-      toast.warning("Group Description cannot be empty!")
+      toast.warning("Group Description cannot be empty!");
       return false; // Validation failed
     }
     if (!topic) {
-      toast.warning("Group Topic cannot be empty!")
+      toast.warning("Group Topic cannot be empty!");
       return false; // Validation failed
     }
 
@@ -60,7 +60,7 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
       typeof group_description !== "string" ||
       typeof topic !== "string"
     ) {
-      toast.warning("All values must be strings.")
+      toast.warning("All values must be strings.");
       return false; // Validation failed
     }
 
@@ -76,8 +76,8 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
     formData.append("topic", e.target.topic.value);
     formData.append("isPrivate", e.target.elements.isPrivate.checked);
 
-    formData.append("workspace_id", WorkspaceID)
-    formData.append("user", authenticated_user_id)
+    formData.append("workspace_id", WorkspaceID);
+    formData.append("user", authenticated_user_id);
 
     if (validate(e)) {
       try {
@@ -96,40 +96,42 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
         );
         if (response.status === 201) {
           toast.success(response.data.message);
-          close()
-          fetchGroupsData()
+          close();
+          fetchGroupsData();
         }
       } catch (error) {
-        close()
+        close();
         console.log("error", error);
-          // Loop through each key in the error response data
-    Object.keys(error.response.data).forEach((key) => {
-      const errorMessages = error.response.data[key];
+        // Loop through each key in the error response data
+        Object.keys(error.response.data).forEach((key) => {
+          const errorMessages = error.response.data[key];
 
-      // Check the type of errorMessages and handle accordingly
-      if (Array.isArray(errorMessages)) {
-        // If errorMessages is an array, iterate over each message
-        errorMessages.forEach((errorMsg) => {
-          toast.error(errorMsg);
-        });
-      } else if (typeof errorMessages === 'string') {
-        // If errorMessages is a string, display it directly
-        toast.error(errorMessages);
-      } else if (typeof errorMessages === 'object' && errorMessages !== null) {
-        // If errorMessages is an object, handle nested errors
-        Object.values(errorMessages).forEach((nestedErrorMsg) => {
-          if (Array.isArray(nestedErrorMsg)) {
-            nestedErrorMsg.forEach((msg) => toast.error(msg));
-          } else if (typeof nestedErrorMsg === 'string') {
-            toast.error(nestedErrorMsg);
+          // Check the type of errorMessages and handle accordingly
+          if (Array.isArray(errorMessages)) {
+            // If errorMessages is an array, iterate over each message
+            errorMessages.forEach((errorMsg) => {
+              toast.error(errorMsg);
+            });
+          } else if (typeof errorMessages === "string") {
+            // If errorMessages is a string, display it directly
+            toast.error(errorMessages);
+          } else if (
+            typeof errorMessages === "object" &&
+            errorMessages !== null
+          ) {
+            // If errorMessages is an object, handle nested errors
+            Object.values(errorMessages).forEach((nestedErrorMsg) => {
+              if (Array.isArray(nestedErrorMsg)) {
+                nestedErrorMsg.forEach((msg) => toast.error(msg));
+              } else if (typeof nestedErrorMsg === "string") {
+                toast.error(nestedErrorMsg);
+              }
+            });
           }
         });
       }
-    });
-        } 
-      }
-      }
-
+    }
+  };
 
   return (
     <div>

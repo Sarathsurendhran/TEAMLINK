@@ -29,8 +29,8 @@ export default function UserProfile({ open, toggleDrawer }) {
 
   const accessToken = localStorage.getItem("access");
   const [isPhotoSelected, setIsPhotoSelected] = useState(false);
-  const [profilePicUrl, setProfilePicUrl] = useState('');
-  const [previewUrl, setPreviewUrl] = useState('');
+  const [profilePicUrl, setProfilePicUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
 
   const handlePhotoChange = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -55,8 +55,7 @@ export default function UserProfile({ open, toggleDrawer }) {
         setName(response.data.user.username);
         setAbout(response.data.about_me);
         setEmail(response.data.user.email);
-        setProfilePicUrl(`${baseURL}${response.data.profile_picture}`);  
-       
+        setProfilePicUrl(`${baseURL}${response.data.profile_picture}`);
       }
     } catch (error) {
       console.log(error);
