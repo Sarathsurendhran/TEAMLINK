@@ -145,9 +145,6 @@ export default function WorkSpaceTabs() {
         config
       );
       if (res.status === 200) {
-        // toast.success(res.data.message);
-        setIsWorkspaceAdmin(res.data.members_data.is_admin);
-
         setCurrentWorkspace(res.data.workspace_data);
         setCurrentWorkspaceName(res.data.workspace_data.workspace_name);
         setDescription(res.data.workspace_data.description);
@@ -156,6 +153,12 @@ export default function WorkSpaceTabs() {
         const members_data = res.data.members_data;
         const members = Array.isArray(members_data) ? members_data : [];
         setMenuItems(members);
+
+        const isAdmin = members_data.some((member) => member.is_admin);
+
+        if (isAdmin) {
+          setIsWorkspaceAdmin(true);
+        }
       }
     } catch (error) {
       console.error("Error launching workspace:", error);

@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
@@ -10,21 +9,49 @@ import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 export default function UserProfile({ open, toggleDrawer }) {
-  const [name, setName] = useState("John Doe");
-  const [about, setAbout] = useState("A short description about me...");
+  const [name, setName] = useState("");
+  const [about, setAbout] = useState("");
   const [photo, setPhoto] = useState(null);
   const baseURL = process.env.REACT_APP_baseURL;
-  // const workspaceID = useSelector((state) => state.workspace.workspaceId);
-
-
+  const workspaceID = useSelector((state) => state.workspace.workspaceId);
+  const authenticated_user = useSelector((state) => state.authenticationUser);
+  const authenticated_user_id = authenticated_user
+    ? authenticated_user.id
+    : null;
 
   const handlePhotoChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       setPhoto(URL.createObjectURL(event.target.files[0]));
     }
   };
+
+  useEffect(() => {
+   const data = {
+      headers: {
+        user_id: authenticated_user_id,
+        workspace_id: workspaceID,
+      },
+    };
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(
+          `${baseURL}user/get-user-profile/`,
+          data
+        );
+        if (response.status === 200) {
+          setName(response.data.username);
+          setAbout(response.data.about);
+          setPhoto(response.data.photo);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUserData();
+  }, [workspaceID]);
 
   const DrawerList = (
     <Box sx={{ width: 400, p: 3 }} role="presentation">
@@ -103,6 +130,7 @@ export default function UserProfile({ open, toggleDrawer }) {
 
   return (
     <div>
+      
       <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>

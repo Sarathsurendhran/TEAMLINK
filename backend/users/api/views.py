@@ -14,7 +14,12 @@ from cryptography.fernet import Fernet
 from decouple import config
 
 from workspaces.models import WorkSpaces, WorkSpaceMembers
-from .serializers import UserRegisterSerializer, VerifyEmailSerializer, LoginSerializer
+from .serializers import (
+    UserRegisterSerializer,
+    VerifyEmailSerializer,
+    LoginSerializer,
+    WorkspaceMembersSerializer,
+)
 
 from workspaces.models import WorkSpaceMembers
 
@@ -250,13 +255,21 @@ class CheckIsBlocked(APIView):
 
 
 class GetUserProfile(APIView):
-    def get(self, request, workspace_id):
+    def get(self, request):
         try:
+            workspace_id = request.headers.get("workspace_id")
             user_data = User.objects.get(id=request.user.id)
             member_profile = WorkSpaceMembers.objects.get(
                 user_id=user_data.id, workspace_id=workspace_id
             )
+            serializer = WorkspaceMembersSerializer(member_profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except WorkSpaceMembers.DoesNotExist:
+            return Response(
+                {"message": "User is not a member of this workspace"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         except Exception as e:
             return Response(
-                {"message": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+                {"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )

@@ -10,7 +10,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-from workspaces.models import WorkSpaces
+from workspaces.models import WorkSpaces, WorkSpaceMembers
 from django.contrib.auth import authenticate
 
 
@@ -69,3 +69,17 @@ class LoginSerializer(serializers.Serializer):
 
         data["user"] = user
         return data
+
+
+class UserSerializerForProfile(serializers.ModelSerializer):
+    class Meta:
+        modal = User
+        fields = ["id", "username", "email"]
+
+
+class WorkspaceMembersSerializer(serializers.ModelSerializer):
+    user = UserSerializerForProfile()
+
+    class Meta:
+        model = WorkSpaceMembers
+        fields = ["id", "about_me", "profile_picture"]

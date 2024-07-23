@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import LogoutIcon from "@mui/icons-material/Logout";
-import UserProfile from "../user_profile/UserProfile";
+import UserProfile from "../UserProfile/UserProfile";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import WorkSpaceUserList from "./WorkSpaceUserList/WorkSpaceUserList";
 import WorkspacesGroups from "./WorkspaceGroups/WorkspacesGroups";

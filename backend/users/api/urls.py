@@ -17,5 +17,5 @@ urlpatterns = [
   path('user-checking/<str:params>', views.UserChecking.as_view(), name='user-checking/'),
   path('check-isblocked/', views.CheckIsBlocked.as_view(), name='check-isblocked/'),
 
-  path('get-user-profile/<int:workspace_id>/', views.GetUserProfile.as_view(), name='get-user-profile/'),
+  path('get-user-profile/', views.GetUserProfile.as_view(), name='get-user-profile/'),
 ]

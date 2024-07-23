@@ -11,6 +11,7 @@ import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
+import CircularProgress from '@mui/material/CircularProgress';
 
 const style = {
   position: "absolute",
@@ -61,6 +62,7 @@ export default function WorkspaceAddUsers() {
       );
 
       if (res.status === 200) {
+        handleClose()
         setLoading(false);
         toast.success(res.data.message);
       }
@@ -102,20 +104,26 @@ export default function WorkspaceAddUsers() {
           },
         }}
       >
-        <Fade in={open}>
-          <Box sx={style}>
+      <Fade in={open}>
+      <Box sx={style}>
+        {loading ? (
+          <div className="flex justify-center items-center h-full w-full">
+            <CircularProgress color="inherit" />
+          </div>
+        ) : (
+          <>
             {/* Modal header */}
-            <div className="flex items-center justify-between p-4 md:p-5 border-b border-gray-600 rounded-t">
+            <div className="p-4 border-b border-gray-600 flex justify-between items-center">
               <Typography variant="h6" component="h3" className="text-white">
                 Add Members
               </Typography>
               <Button
                 type="button"
-                className="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                className="text-gray-400 hover:text-gray-900 rounded-lg p-1"
                 onClick={handleClose}
               >
                 <svg
-                  className="w-3 h-3"
+                  className="w-4 h-4"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -129,12 +137,11 @@ export default function WorkspaceAddUsers() {
                     d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                   />
                 </svg>
-
                 <span className="sr-only">Close modal</span>
               </Button>
             </div>
             {/* Modal body */}
-            <div className="p-4 md:p-5">
+            <div className="p-4">
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
                   <label
@@ -147,25 +154,26 @@ export default function WorkspaceAddUsers() {
                     type="email"
                     name="email"
                     id="email"
-                    className="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+                    className="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg w-full p-2.5 placeholder-gray-400"
                     placeholder="name@company.com"
                     required
                   />
                 </div>
-
                 <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   color="primary"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  className="text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm py-2.5"
                 >
                   Send Invitation
                 </Button>
               </form>
             </div>
-          </Box>
-        </Fade>
+          </>
+        )}
+      </Box>
+    </Fade>
       </Modal>
     </div>
   );
