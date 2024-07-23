@@ -19,7 +19,7 @@ class WorkSpaceMembers(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     about_me = models.CharField(max_length=250)
     is_admin = models.BooleanField(default=False)
-    profile_picture = models.ImageField(upload_to="profile_picture")
+    profile_picture = models.ImageField(upload_to="profile_pictures")
     is_active = models.BooleanField(default=True)
 
     def __str__(self) -> str:

@@ -73,7 +73,7 @@ class LoginSerializer(serializers.Serializer):
 
 class UserSerializerForProfile(serializers.ModelSerializer):
     class Meta:
-        modal = User
+        model = User
         fields = ["id", "username", "email"]
 
 
@@ -82,4 +82,4 @@ class WorkspaceMembersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkSpaceMembers
-        fields = ["id", "about_me", "profile_picture"]
+        fields = ["id", "about_me", "profile_picture", "user"]

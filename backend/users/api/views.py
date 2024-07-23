@@ -22,6 +22,7 @@ from .serializers import (
 )
 
 from workspaces.models import WorkSpaceMembers
+from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(["GET"])
@@ -257,10 +258,12 @@ class CheckIsBlocked(APIView):
 class GetUserProfile(APIView):
     def get(self, request):
         try:
-            workspace_id = request.headers.get("workspace_id")
-            user_data = User.objects.get(id=request.user.id)
+            workspace_id = request.GET.get("workspace_id")
+            user_id = request.GET.get("user_id")
+            user_data = User.objects.get(id=user_id)
+
             member_profile = WorkSpaceMembers.objects.get(
-                user_id=user_data.id, workspace_id=workspace_id
+                user_id=user_data, workspace_id=workspace_id
             )
             serializer = WorkspaceMembersSerializer(member_profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -270,6 +273,104 @@ class GetUserProfile(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         except Exception as e:
+            print("errrorr", e)
             return Response(
                 {"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class ChangeUserName(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            username = request.data.get("username")
+            user_id = request.data.get("user_id")
+
+            user_data = User.objects.get(id=user_id)
+            user_data.username = username
+            user_data.save()
+            return Response(
+                {"message": "User Name Updated Sucessfully"}, status=status.HTTP_200_OK
+            )
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User Not Found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"message": "Something Went Wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class ChangeAboutUser(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            about = request.data.get("about")
+            user_id = request.data.get("user_id")
+            workspace_id = request.data.get("workspace_id")
+
+            user_data = User.objects.get(id=user_id)
+            workspace_data = WorkSpaceMembers.objects.get(
+                user=user_data, workspace_id=workspace_id
+            )
+            workspace_data.about_me = about
+            workspace_data.save()
+            return Response(
+                {"message": "About Updated Sucessfully"}, status=status.HTTP_200_OK
+            )
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User Not Found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        except WorkSpaceMembers.DoesNotExist:
+            return Response(
+                {"message": "Workspace Not Found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"message": "Something Went Wrong"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class ChangeProfilePic(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            profile_pic = request.data.get("profile_pic")
+            user_id = request.data.get("user_id")
+            workspace_id = request.data.get("workspace_id")
+
+            user_data = User.objects.get(id=user_id)
+            workspace_data = WorkSpaceMembers.objects.get(
+                user=user_data, workspace_id=workspace_id
+            )
+            workspace_data.profile_picture = profile_pic
+            workspace_data.save()
+            return Response(
+                {"message": "Profile Picture Updated Sucessfully"},
+                status=status.HTTP_200_OK,
+            )
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User Not Found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        except WorkSpaceMembers.DoesNotExist:
+            return Response(
+                {"message": "Workspace Not Found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        except Exception as e:
+            print(e)
+            return Response(
+                {"message": "Something Went Wrong"}, status=status.HTTP_400_BAD_REQUEST
             )

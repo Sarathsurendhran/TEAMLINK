@@ -18,4 +18,7 @@ urlpatterns = [
   path('check-isblocked/', views.CheckIsBlocked.as_view(), name='check-isblocked/'),
 
   path('get-user-profile/', views.GetUserProfile.as_view(), name='get-user-profile/'),
+  path('change-user-name/', views.ChangeUserName.as_view(), name='change-user-name'),
+  path('change-about-user/', views.ChangeAboutUser.as_view(), name='change-about-user'),
+  path('change-profile-pic/', views.ChangeProfilePic.as_view(), name='change-profile-pic'),
 ]

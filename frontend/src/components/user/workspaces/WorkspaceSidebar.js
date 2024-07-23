@@ -56,7 +56,7 @@ const WorkspaceSidebar = () => {
   }, [open]);
 
   return (
-    <>
+    <>    
       {/* Sidebar */}
 
       <div
