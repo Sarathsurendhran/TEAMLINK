@@ -6,7 +6,6 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Avatar from "@mui/material/Avatar";
-import TextField from "@mui/material/TextField";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -39,6 +38,8 @@ export default function UserProfile({ open, toggleDrawer }) {
     }
   };
 
+
+
   useEffect(() => {
     fetchUserData();
   }, [workspaceID, open]);
@@ -55,7 +56,7 @@ export default function UserProfile({ open, toggleDrawer }) {
         setName(response.data.user.username);
         setAbout(response.data.about_me);
         setEmail(response.data.user.email);
-        setProfilePicUrl(`${baseURL}${response.data.profile_picture}`);
+        setProfilePicUrl(response.data.profile_picture);
       }
     } catch (error) {
       console.log(error);
@@ -63,7 +64,6 @@ export default function UserProfile({ open, toggleDrawer }) {
   };
 
   // For change user name
-
   const changeUserName = async () => {
     const config = {
       headers: {
@@ -94,7 +94,7 @@ export default function UserProfile({ open, toggleDrawer }) {
     }
   };
 
-  // change About
+  // Change About
   const changeAbout = async () => {
     const config = {
       headers: {
@@ -126,7 +126,7 @@ export default function UserProfile({ open, toggleDrawer }) {
     }
   };
 
-  // chnage profile pic
+  // Change profile pic
   const changeUserProfilePic = async () => {
     const config = {
       headers: {
@@ -150,8 +150,7 @@ export default function UserProfile({ open, toggleDrawer }) {
         toast.success(response.data.message);
         console.log("ProfilePic updated");
         fetchUserData();
-        setPhoto(null);
-        setIsPhotoSelected(false);
+        setIsPhotoSelected(false)
       } else {
         toast.error(response.data.message);
       }
@@ -160,149 +159,140 @@ export default function UserProfile({ open, toggleDrawer }) {
     }
   };
 
-  useEffect(() => {
-    // Create a preview URL when the photo changes
-    if (photo) {
-      const newPreviewUrl = URL.createObjectURL(photo);
-      setPreviewUrl(newPreviewUrl);
 
-      // Clean up the previous preview URL
-      return () => {
-        if (previewUrl) {
-          URL.revokeObjectURL(previewUrl);
-        }
-      };
-    }
-  }, [photo]);
 
   const DrawerList = (
-    <Box sx={{ width: 400, p: 3 }} role="presentation">
-      <IconButton
-        sx={{ position: "absolute", top: 8, left: 8 }}
-        onClick={toggleDrawer(false)}
+    <>
+      <Box
+        sx={{
+          width: 400,
+          p: 3,
+          color: "white",
+          height: "100vh",
+          backgroundColor: "#323232",
+        }}
+        role="presentation"
       >
-        <CloseIcon />
-      </IconButton>
-      <Divider sx={{ mt: 5 }} />
-
-      {/* Photo Upload Section */}
-      <Box sx={{ textAlign: "center", mt: 3 }}>
-        <Avatar
-          alt="User Photo"
-          src={profilePicUrl}
-          sx={{ width: 100, height: 100, margin: "0 auto" }}
-        />
-        <input
-          accept="image/*"
-          style={{ display: "none" }}
-          id="upload-photo"
-          type="file"
-          onChange={handlePhotoChange}
-        />
-        <label htmlFor="upload-photo">
-          <Button
-            variant="contained"
-            color="primary"
-            component="span"
-            startIcon={<PhotoCamera />}
-            sx={{ mt: 2 }}
-          >
-            Upload Photo
-          </Button>
-        </label>
-        {isPhotoSelected && (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={changeUserProfilePic}
-            sx={{ mt: 2 }}
-          >
-            Submit
-          </Button>
-        )}
-      </Box>
-
-      {/* Name Edit Section */}
-      <Box sx={{ mt: 3, display: "flex", alignItems: "center" }}>
-        <TextField
-          fullWidth
-          label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={!isEditingName}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setIsEditingName(!isEditingName)}
-          sx={{ ml: 2 }}
+        <IconButton
+          sx={{ position: "absolute", top: 8, left: 8, color: "white" }}
+          onClick={toggleDrawer(false)}
         >
-          {isEditingName ? (
-            <button onClick={changeUserName}>Submit</button>
-          ) : (
-            "Edit"
+          <CloseIcon />
+        </IconButton>
+        <Divider sx={{ mt: 5 }} />
+
+        {/* Photo Upload Section */}
+        <Box sx={{ textAlign: "center", mt: 3 }}>
+          <Avatar
+            alt="User Photo"
+            src={baseURL.replace(/\/$/, '') + profilePicUrl} 
+            sx={{ width: 100, height: 100, margin: "0 auto" }}
+          />
+  
+          <input
+            accept="image/*"
+            style={{ display: "none" }}
+            id="upload-photo"
+            type="file"
+            onChange={handlePhotoChange}
+          />
+          <label htmlFor="upload-photo">
+            <Button
+              variant="contained"
+              color="primary"
+              component="span"
+              startIcon={<PhotoCamera />}
+              sx={{ mt: 2 }}
+            >
+              Upload Photo
+            </Button>
+          </label>
+          {isPhotoSelected && (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={changeUserProfilePic}
+              sx={{ mt: 2, ml:1 }}
+            >
+              Submit
+            </Button>
           )}
-        </Button>
-      </Box>
+        </Box>
 
-      {/* About Me Section */}
-      <Box sx={{ mt: 3, display: "flex", alignItems: "center" }}>
-        <TextField
-          fullWidth
-          label="About Me"
-          multiline
-          rows={4}
-          value={about}
-          onChange={(e) => setAbout(e.target.value)}
-          disabled={!isEditingAbout}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setIsEditingAbout(!isEditingAbout)}
-          sx={{ ml: 2 }}
-        >
-          {isEditingAbout ? (
-            <button onClick={changeAbout}>Submit</button>
-          ) : (
-            "Edit"
-          )}
-        </Button>
-      </Box>
+        {/* Name Edit Section */}
+        <div className="mt-6">
+          <div className=" mb-1 text-lg">
+            <label htmlFor="">Name</label>
+          </div>
+          <div className=" flex items-center">
+            <input
+              type="text"
+              className={`w-full border border-gray-300 p-2 rounded focus:border-blue-500 ${
+                isEditingName ? "text-black" : ""
+              }`}
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={!isEditingName}
+            />
+            <button
+              className="ml-2 px-4 py-2 bg-blue-500 text-white rounded"
+              onClick={() => setIsEditingName(!isEditingName)}
+            >
+              {isEditingName ? (
+                <button onClick={changeUserName}>Submit</button>
+              ) : (
+                "Edit"
+              )}
+            </button>
+          </div>
+        </div>
+        {/* About Me Section */}
+        <div className="flex-col mt-4 ">
+          <div className=" mb-1 text-lg">
+            <label htmlFor="">About</label>
+          </div>
 
-      {/* Email Section */}
-      <Box sx={{ mt: 3, display: "flex", alignItems: "center" }}>
-        <TextField
-          fullWidth
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={!isEditingEmail}
-        />
-        {/* <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setIsEditingEmail(!isEditingEmail)}
-          sx={{ ml: 2 }}
-        >
-          {isEditingEmail ? "Submit" : "Edit"}
-        </Button> */}
-      </Box>
+          <div className=" flex items-center ">
+            <textarea
+              className={`w-full border border-gray-300 p-2 rounded focus:border-blue-500 ${
+                isEditingAbout ? "text-black" : ""
+              }`}
+              placeholder="About Me"
+              rows={4}
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+              disabled={!isEditingAbout}
+            />
+            <button
+              className="ml-2 px-4 py-2 bg-blue-500 text-white rounded"
+              onClick={() => setIsEditingAbout(!isEditingAbout)}
+            >
+              {isEditingAbout ? (
+                <button onClick={changeAbout}>Submit</button>
+              ) : (
+                "Edit"
+              )}
+            </button>
+          </div>
+        </div>
 
-      {/* <Box sx={{ textAlign: "center", mt: 3 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            // Save the changes logic
-            console.log("Profile Updated:", { name, about, email, photo });
-            toggleDrawer(false)();
-          }}
-        >
-          Save Changes
-        </Button>
-      </Box> */}
-    </Box>
+        {/* Email Section */}
+        <div className="mt-3 flex flex-col">
+          <label className="mb-1 text-lg" htmlFor="">
+            Email
+          </label>
+          <input
+            type="email"
+            className="w-full border border-gray-300 p-2 rounded"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={!isEditingEmail}
+          />
+        </div>
+      </Box>
+    </>
   );
 
   return (

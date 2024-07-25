@@ -265,6 +265,7 @@ class GetUserProfile(APIView):
             member_profile = WorkSpaceMembers.objects.get(
                 user_id=user_data, workspace_id=workspace_id
             )
+
             serializer = WorkspaceMembersSerializer(member_profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except WorkSpaceMembers.DoesNotExist:
