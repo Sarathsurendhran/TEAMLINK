@@ -25,7 +25,8 @@ const style = {
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
-export default function CreateGroupModal({ open, close, fetchGroupsData }) {
+export default function CreateGroupModal({ fetchGroupsData }) {
+  const [isOpen, setIsOpen] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const WorkspaceID = useSelector((state) => state.workspace.workspaceId);
   const authenticated_user = useSelector((state) => state.authenticationUser);
@@ -34,6 +35,10 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
     : null;
 
   const baseURL = process.env.REACT_APP_baseURL;
+
+  const handleGroupModalOpen = () => {
+    setIsOpen(!isOpen);
+  };
 
   const validate = (e) => {
     let group_name = e.target.group_name.value;
@@ -74,7 +79,7 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
     formData.append("group_name", e.target.group_name.value);
     formData.append("description", e.target.group_description.value);
     formData.append("topic", e.target.topic.value);
-    formData.append("isPrivate", e.target.elements.isPrivate.checked);
+    // formData.append("isPrivate", e.target.elements.isPrivate.checked);
 
     formData.append("workspace_id", WorkspaceID);
     formData.append("user", authenticated_user_id);
@@ -96,11 +101,11 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
         );
         if (response.status === 201) {
           toast.success(response.data.message);
-          close();
+          handleGroupModalOpen();
           fetchGroupsData();
         }
       } catch (error) {
-        close();
+        handleGroupModalOpen();
         console.log("error", error);
         // Loop through each key in the error response data
         Object.keys(error.response.data).forEach((key) => {
@@ -135,11 +140,18 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
 
   return (
     <div>
+      <Button
+        variant="contained"
+        color="success"
+        onClick={handleGroupModalOpen}
+      >
+        Create new Group
+      </Button>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
-        open={open}
-        onClose={close}
+        open={isOpen}
+        onClose={handleGroupModalOpen}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
         slotProps={{
@@ -148,7 +160,7 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
           },
         }}
       >
-        <Fade in={open}>
+        <Fade in={isOpen}>
           <Box sx={style}>
             <Typography
               id="transition-modal-title"
@@ -207,7 +219,7 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
                 />
 
                 <div className="flex justify-between">
-                  <div>
+                  {/* <div>
                     Private :
                     <Checkbox
                       {...label}
@@ -221,7 +233,8 @@ export default function CreateGroupModal({ open, close, fetchGroupsData }) {
                         },
                       }}
                     />
-                  </div>
+                  </div> */}
+                  <div></div>
                   <Button type="submit" variant="contained" color="primary">
                     Submit
                   </Button>

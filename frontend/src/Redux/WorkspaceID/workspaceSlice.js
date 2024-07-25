@@ -14,9 +14,12 @@ const workspaceSlice = createSlice({
     setWorkspaceName: (state, action) => {
       state.workspaceName = action.payload;
     },
+    setWorkspaceAdmin: (state, action) => {
+      state.workspaceAdmin = action.payload;
+    },
   },
 });
 
-export const { setWorkspaceId, setWorkspaceName } = workspaceSlice.actions;
+export const { setWorkspaceId, setWorkspaceName, setWorkspaceAdmin } = workspaceSlice.actions;
 
 export default workspaceSlice.reducer;

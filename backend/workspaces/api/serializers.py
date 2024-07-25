@@ -83,3 +83,12 @@ class UpdateWorkspaceNameSerializer(serializers.Serializer):
 class UpdateWorkspaceDescrptionSerializer(serializers.Serializer):
     workspace_id = serializers.IntegerField()
     workspace_description = serializers.CharField(max_length=300)
+
+
+
+
+class WorkspaceMemberSerializerForUserList(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = WorkSpaceMembers
+        fields = ['id', 'user']

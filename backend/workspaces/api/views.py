@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from workspaces.models import WorkSpaceMembers, WorkSpaces
+from group_chat.models import WorkspaceGroups, GroupMembers
 from users.models import User
 from rest_framework.generics import CreateAPIView, ListAPIView
 from workspaces.api.serializers import (
@@ -12,6 +13,7 @@ from workspaces.api.serializers import (
     WorkspaceMemberSerializer,
     UpdateWorkspaceNameSerializer,
     UpdateWorkspaceDescrptionSerializer,
+    WorkspaceMemberSerializerForUserList,
 )
 from rest_framework.permissions import IsAuthenticated
 from workspaces.send_invitation import send_invitation
@@ -149,6 +151,7 @@ class WorkSpaceHome(APIView):
 
             try:
                 user_name = User.objects.get(id=workspace.created_by.id)
+                # workspace_admin = WorkSpaces.objects.get(id=id, is_active=True, )
 
             except Exception as e:
                 print("error", e)
@@ -158,7 +161,7 @@ class WorkSpaceHome(APIView):
                     "message": "Success",
                     "workspace_data": workspace_serializer.data,
                     "members_data": member_serializer.data,
-                    "user_name":user_name.username
+                    "user_name": user_name.username,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -249,3 +252,44 @@ class UpdateWorkspaceDescription(APIView):
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class ListWorkSpaceUsers(APIView):
+    def get(self, request):
+        workspace_id = request.query_params.get("workspaceID")
+        group_id = request.query_params.get("groupId")
+
+        if not workspace_id:
+            return Response(
+                {"error": "workspaceID is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Get users in the specified group
+            group_members = GroupMembers.objects.filter(group=group_id).values_list('member', flat=True)
+            
+            # Get all workspace members
+            workspace_members = WorkSpaceMembers.objects.filter(workspace_id=workspace_id)
+            
+            # Filter out users who are in the group
+            users_to_exclude = group_members
+            users = [member for member in workspace_members if member.id not in users_to_exclude]
+            
+            # Serialize the remaining users
+            serializer = WorkspaceMemberSerializerForUserList(users, many=True)
+            return Response({"users": serializer.data}, status=status.HTTP_200_OK)
+        
+        except WorkSpaceMembers.DoesNotExist:
+            return Response(
+                {"error": "Workspace not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        except GroupMembers.DoesNotExist:
+            return Response(
+                {"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

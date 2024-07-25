@@ -10,7 +10,7 @@ class WorkspaceGroups(models.Model):
     is_private = models.BooleanField(default=False)
     topic = models.CharField(max_length=200, null=True)
     created_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True
+        WorkSpaceMembers, on_delete=models.SET_NULL, null=True
     )
     workspace = models.ForeignKey(WorkSpaces, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)

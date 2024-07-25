@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from workspaces.models import WorkSpaceMembers, WorkSpaces
-from group_chat.models import WorkspaceGroups
+from group_chat.models import WorkspaceGroups, GroupMembers
 
 
 class CreateGroupSerializer(serializers.ModelSerializer):
@@ -37,5 +37,13 @@ class CreateGroupSerializer(serializers.ModelSerializer):
 class WorkspaceGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkspaceGroups
+        fields = '__all__'
+
+
+class GroupMembersSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='member.user.username', read_only=True)
+    user_id = serializers.IntegerField(source='member.user.id', read_only=True)
+    class Meta:
+        model = GroupMembers
         fields = '__all__'
 

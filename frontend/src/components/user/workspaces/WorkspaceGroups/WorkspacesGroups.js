@@ -8,6 +8,8 @@ import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 import ArrowRightSharpIcon from "@mui/icons-material/ArrowRightSharp";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import Button from "@mui/material/Button";
+import CreateGroupModal from "../../Group/CreateGroup";
+import { setGroupId } from "../../../../Redux/Groups/GroupSlice";
 
 const WorkspacesGroups = () => {
   const [groupsOpen, setGroupsOpen] = useState(false);
@@ -18,10 +20,17 @@ const WorkspacesGroups = () => {
 
   const baseURL = process.env.REACT_APP_baseURL;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const workspaceID = useSelector((state) => state.workspace.workspaceId);
+  const workspaceAdmin = useSelector((state) => state.workspace.workspaceAdmin);
+  const authenticated_user = useSelector((state) => state.authenticationUser);
+  const authenticated_user_id = authenticated_user
+    ? authenticated_user.id
+    : null;
 
   //............................................Fetching Groups...................................
 
+  console.log("workspaceID", workspaceID);
   const [groups, setGroups] = useState([]);
 
   useEffect(() => {
@@ -36,13 +45,24 @@ const WorkspacesGroups = () => {
       },
     };
     try {
-      const response = await axios.get(`${baseURL}group/list-groups/`, config);
+      const response = await axios.get(
+        `${baseURL}group/list-groups/${workspaceID}/`,
+        config
+      );
       if (response.status === 200) {
         setGroups(response.data.groups);
+      } else {
+        setGroups([]);
       }
     } catch (error) {
+      setGroups([]);
       console.log(error);
     }
+  };
+
+  const handleGroupLaunch = (id) => {
+    dispatch(setGroupId(id));
+    console.log(id);
   };
 
   return (
@@ -82,22 +102,11 @@ const WorkspacesGroups = () => {
             className=" hs-accordion-group ps-3 pt-2"
             data-hs-accordion-always-open=""
           >
-            {/* {workspaceAdmin && (
+            {workspaceAdmin === authenticated_user_id && (
               <>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={handleGroupModalOpen}
-                >
-                  Create new Group
-                </Button>
-                <CreateGroupModal
-                  open={creategroupopen}
-                  close={handleGroupModalClose}
-                  fetchGroupsData={fetchGroupsData}
-                />
+                <CreateGroupModal fetchGroupsData={fetchGroupsData} />
               </>
-            )} */}
+            )}
 
             {groups.map((group, index) => (
               <li
@@ -107,10 +116,13 @@ const WorkspacesGroups = () => {
               >
                 <button
                   type="button"
-                  className=" border border-white mt-2 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-500"
+                  className="  mt-2 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-500"
+                  onClick={() => handleGroupLaunch(group.id)}
                 >
                   <div className="flex items-center ">
-                    <span className="mr-10">{group.group_name}</span>
+                    <span className="mr-10 text-base">
+                      # {group.group_name}
+                    </span>
                   </div>
                 </button>
               </li>

@@ -10,12 +10,13 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from 'redux-persist'
+} from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { encryptTransform } from "redux-persist-transform-encrypt";
+import groupReducer from "../Redux/Groups/GroupSlice";
 
 // Configure the encryption transform for workspace
-const encryptor = encryptTransform({ 
+const encryptor = encryptTransform({
   secretKey: process.env.REACT_APP_SECRET_KEY,
   onError: function (error) {
     console.error("Encryption error:", error);
@@ -29,13 +30,25 @@ const workspacePersistConfig = {
   transforms: [encryptor],
 };
 
-// Persisted workspace reducer
-const persistedWorkspaceReducer = persistReducer(workspacePersistConfig, workspaceReducer);
+// persist configuraton for group with encryption
+const groupPersistConfig = {
+  key: "group",
+  storage,
+  transforms: [encryptor],
+};
+
+// Persisted reducers
+const persistedWorkspaceReducer = persistReducer(
+  workspacePersistConfig,
+  workspaceReducer
+);
+const persistedGroupReducer = persistReducer(groupPersistConfig, groupReducer);
 
 // Create a root reducer combining persisted and non-persisted reducers
 const rootReducer = combineReducers({
   authenticationUser: authenticationSliceReducer, // Non-persisted
   workspace: persistedWorkspaceReducer, // Persisted with encryption
+  group: persistedGroupReducer,
 });
 
 // Create store with combined reducer

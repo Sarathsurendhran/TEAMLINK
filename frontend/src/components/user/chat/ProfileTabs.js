@@ -11,8 +11,10 @@ import Box from "@mui/material/Box";
 
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setWorkspaceId } from "../../../Redux/WorkspaceID/workspaceSlice";
 import axios from "axios";
+import EditGroup from "../Group/EditGroup";
+import GroupMembers from "../Group/GroupMembers";
+import AddMembers from "../Group/AddMembers";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -60,15 +62,6 @@ export default function ProfileTab() {
     setValue(index);
   };
 
-  const [workspaces, setWorkspaces] = useState([]);
-  const [user, setUser] = useState(null);
-  const baseURL = process.env.REACT_APP_baseURL;
-  const accessToken = localStorage.getItem("access");
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-
-
   return (
     <Box sx={{ bgcolor: "#323232", width: 550 }}>
       <AppBar position="static" sx={{ bgcolor: "#323232" }}>
@@ -81,8 +74,8 @@ export default function ProfileTab() {
           aria-label="full width tabs example"
         >
           <Tab label="About" {...a11yProps(0)} />
-          <Tab label="Workspaces" {...a11yProps(1)} />
-          <Tab label="Settings" {...a11yProps(2)} />
+          <Tab label="Members" {...a11yProps(1)} />
+          {/* <Tab label="Settings" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
       <SwipeableViews
@@ -96,7 +89,7 @@ export default function ProfileTab() {
           index={0}
           dir={theme.direction}
         >
-          Item One
+          <EditGroup />
         </TabPanel>
 
         <TabPanel
@@ -105,17 +98,18 @@ export default function ProfileTab() {
           index={1}
           dir={theme.direction}
         >
-        
+          {/* <AddMembers/> */}
+          <GroupMembers />
         </TabPanel>
 
-        <TabPanel
+        {/* <TabPanel
           className="text-white"
           value={value}
           index={2}
           dir={theme.direction}
         >
           Item Three
-        </TabPanel>
+        </TabPanel> */}
       </SwipeableViews>
     </Box>
   );

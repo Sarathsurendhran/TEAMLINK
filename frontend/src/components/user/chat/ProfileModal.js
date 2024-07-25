@@ -45,7 +45,7 @@ const ProfileModal = ({ open, handleClose}) => {
           <Box sx={style}>
             <Typography
               id="transition-modal-title"
-              className="bg-white h-24"
+              className="bg-white h-12"
               variant="h6"
               component="h2"
             >

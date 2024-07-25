@@ -4,21 +4,20 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
-
 import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 import ArrowRightSharpIcon from "@mui/icons-material/ArrowRightSharp";
 import PeopleIcon from "@mui/icons-material/People";
-
+import { setWorkspaceAdmin } from "../../../../Redux/WorkspaceID/workspaceSlice";
 
 const WorkSpaceUserList = () => {
-
   const [usersOpen, setUsersOpen] = useState(false);
   const [menuItems, setMenuItems] = useState([]);
   const [workspaceData, setWorkspaceData] = useState([]);
-  const [workspaceAdmin, setWorkspaceAdmin] = useState(false)
+  // const [workspaceAdmin, setWorkspaceAdmin] = useState(false)
 
   const baseURL = process.env.REACT_APP_baseURL;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const workspaceID = useSelector((state) => state.workspace.workspaceId);
   const authenticated_user = useSelector((state) => state.authenticationUser);
   const authenticated_user_id = authenticated_user
@@ -26,53 +25,50 @@ const WorkSpaceUserList = () => {
     : null;
 
   const toggleUsersAccordion = () => {
-      setUsersOpen(!usersOpen);
-    };
-  
-//.................. feteching all the data of the current workspace and user............
-useEffect(() => {
-  try {
-    fetchData();
-  } catch (error) {
-    console.log(error);
-  }
-}, [workspaceID]);
-
-const fetchData = async () => {
-  const accessToken = localStorage.getItem("access");
-  const config = {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    setUsersOpen(!usersOpen);
   };
 
-  try {
-    const res = await axios.get(
-      `${baseURL}workspace/workspace-home/${workspaceID}/`,
-      config
-    );
-    if (res.status === 200) {
-      toast.success(res.data.message);
-
-      const workspace_data = res.data.workspace_data;
-      setWorkspaceData(workspace_data);
-
-      const members_data = res.data.members_data;
-      const members = Array.isArray(members_data) ? members_data : [];
-      setMenuItems(members);
-      const checkIsAdmin = members.some((member)=>member.user.id === authenticated_user_id && member.is_admin)
-      if (checkIsAdmin){
-        setWorkspaceAdmin(true)
-      }
-      
+  //.................. feteching all the data of the current workspace and user............
+  useEffect(() => {
+    try {
+      fetchData();
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.error("Error launching workspace:", error);
-  }
-};
+  }, [workspaceID]);
 
+  const fetchData = async () => {
+    const accessToken = localStorage.getItem("access");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
 
+    try {
+      const res = await axios.get(
+        `${baseURL}workspace/workspace-home/${workspaceID}/`,
+        config
+      );
+      if (res.status === 200) {
+        toast.success(res.data.message);
 
+        const workspace_data = res.data.workspace_data;
+        setWorkspaceData(workspace_data);
+        dispatch(setWorkspaceAdmin(res.data.workspace_data.created_by));
+
+        const members_data = res.data.members_data;
+        const members = Array.isArray(members_data) ? members_data : [];
+        setMenuItems(members);
+        // const checkIsAdmin = members.some((member)=>member.user.id === authenticated_user_id && member.is_admin)
+        // if (checkIsAdmin){
+        //   setWorkspaceAdmin(true)
+        // }
+      }
+    } catch (error) {
+      console.error("Error launching workspace:", error);
+    }
+  };
 
   return (
     <div>
