@@ -128,9 +128,9 @@ const Register = () => {
 
   return (
     <>
-      <div className="w-full h-screen text-gray-900 flex justify-center sm:px-10 lg:px-40 xl:px-80 ">
+      <div className="w-full h-screen text-gray-900 flex justify-center  sm:px-10 lg:px-40 xl:px-80 ">
         <div className="max-w-screen-xl m-0 sm:m-10 bg-white sm:rounded-lg flex justify-center flex-1 ">
-          <div className=" lg:w-20 xl:w-full p-2 ">
+          <div className=" md:w-full lg:w-full xl:w-full p-2 ">
             <div className="-ml-10">
               <img src={logo} className="w-60 mx-auto" />
             </div>

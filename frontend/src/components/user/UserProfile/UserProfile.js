@@ -8,8 +8,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import Avatar from "@mui/material/Avatar";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { setProfileImage } from "../../../Redux/UserProfile/userProfileSlice";
 
 export default function UserProfile({ open, toggleDrawer }) {
   const [name, setName] = useState("");
@@ -25,11 +26,13 @@ export default function UserProfile({ open, toggleDrawer }) {
   const authenticated_user_id = authenticated_user
     ? authenticated_user.id
     : null;
+  const dispatch = useDispatch()
 
   const accessToken = localStorage.getItem("access");
   const [isPhotoSelected, setIsPhotoSelected] = useState(false);
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
+  
 
   const handlePhotoChange = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -57,6 +60,7 @@ export default function UserProfile({ open, toggleDrawer }) {
         setAbout(response.data.about_me);
         setEmail(response.data.user.email);
         setProfilePicUrl(response.data.profile_picture);
+        dispatch(setProfileImage(response.data.profile_picture))
       }
     } catch (error) {
       console.log(error);

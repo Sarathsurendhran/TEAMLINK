@@ -6,9 +6,13 @@ import WorkSpaceUserList from "./WorkSpaceUserList/WorkSpaceUserList";
 import WorkspacesGroups from "./WorkspaceGroups/WorkspacesGroups";
 import WorkspaceAddUsers from "./WorkspaceAddUsers/WorkspaceAddUsers";
 import WorkspaceSettingsModal from "./WorkspaceSettings/WorkspaceSettingsModal";
-import PrivateRoutes from "../../private_routes/private_routes";
+import Avatar from "@mui/material/Avatar";
+import { useSelector } from "react-redux";
 
 const WorkspaceSidebar = () => {
+  const profileImage = useSelector((state) => state.userProfile.profileImage);
+  const baseURL = process.env.REACT_APP_baseURL;
+
   // ...............................handiling logout......................................
   const handleLogout = (event) => {
     event.preventDefault();
@@ -55,8 +59,9 @@ const WorkspaceSidebar = () => {
     }
   }, [open]);
 
+  console.log(profileImage);
   return (
-    <>    
+    <>
       {/* Sidebar */}
 
       <div
@@ -68,11 +73,17 @@ const WorkspaceSidebar = () => {
             <div
               className="w-10 h-10 bg-blue-500 rounded-full border cursor-pointer mb-20"
               onClick={handleProfileOpen}
-            ></div>
+            >
+              <Avatar
+                src={
+                  profileImage
+                    ? baseURL.replace(/\/$/, "") + profileImage
+                    : "/broken-image.jpg"
+                }
+              />
+            </div>
           </div>
-
           {/* profile menu */}
-
           {profileopen && (
             <div className="mt-96">
               <div className="mt-28">
@@ -127,8 +138,8 @@ const WorkspaceSidebar = () => {
               <WorkspaceSettings />
             </div> */}
 
-              <WorkspaceSettingsModal />
-            
+            <WorkspaceSettingsModal />
+
             <nav
               className="hs-accordion-group p-6 w-full flex flex-col flex-wrap"
               data-hs-accordion-always-open=""
