@@ -9,7 +9,7 @@ import ArrowRightSharpIcon from "@mui/icons-material/ArrowRightSharp";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import Button from "@mui/material/Button";
 import CreateGroupModal from "../../Group/CreateGroup";
-import { setGroupId } from "../../../../Redux/Groups/GroupSlice";
+import { setGroupId, setGroupName } from "../../../../Redux/Groups/GroupSlice";
 
 const WorkspacesGroups = () => {
   const [groupsOpen, setGroupsOpen] = useState(false);
@@ -60,8 +60,10 @@ const WorkspacesGroups = () => {
     }
   };
 
-  const handleGroupLaunch = (id) => {
+  const handleGroupLaunch = (id, group_name) => {
     dispatch(setGroupId(id));
+    dispatch(setGroupName(group_name));
+    navigate('chat')
     console.log(id);
   };
 
@@ -117,7 +119,7 @@ const WorkspacesGroups = () => {
                 <button
                   type="button"
                   className="  mt-2 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-500"
-                  onClick={() => handleGroupLaunch(group.id)}
+                  onClick={() => handleGroupLaunch(group.id, group.group_name)}
                 >
                   <div className="flex items-center ">
                     <span className="mr-10 text-base">

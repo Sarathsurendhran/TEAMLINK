@@ -11,8 +11,12 @@ const groupSlice = createSlice({
     setGroupId: (state, action) => {
       state.groupId = action.payload;
     },
+
+    setGroupName:(state, action)=>{
+      state.groupName = action.payload
+    },
   },
 });
 
-export const { setGroupId } = groupSlice.actions;
+export const { setGroupId, setGroupName } = groupSlice.actions;
 export default groupSlice.reducer;

@@ -51,7 +51,8 @@ const UserWrapper = () => {
           </WorkspaceIsblocked>
         </PrivateRoutes>
       ),
-      children: [{ path: "chat", element:<GroupChat/> }],
+      children: [{ path: "chat", element: <GroupChat /> }],
+      
     },
 
     {
