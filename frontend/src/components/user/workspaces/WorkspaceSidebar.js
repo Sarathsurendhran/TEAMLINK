@@ -59,7 +59,7 @@ const WorkspaceSidebar = () => {
     }
   }, [open]);
 
-  console.log(profileImage);
+
   return (
     <>
       {/* Sidebar */}

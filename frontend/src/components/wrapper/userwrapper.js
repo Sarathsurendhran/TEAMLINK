@@ -16,7 +16,7 @@ import ThreeDBackground from "../vantajs/ThreeDBackground";
 import UserCheckingWrapper from "./userchecking_wrapper";
 import WorkspaceIsblocked from "./checking_workspace_isblocked";
 import { useRoutes } from "react-router-dom";
-import GroupChat from "../user/chat/GroupChat";
+import Chat from "../user/chat/Chat";
 
 const UserWrapper = () => {
   const authentication_user = useSelector((state) => state.authentication_user);
@@ -51,7 +51,7 @@ const UserWrapper = () => {
           </WorkspaceIsblocked>
         </PrivateRoutes>
       ),
-      children: [{ path: "chat", element: <GroupChat /> }],
+      children: [{ path: "chat", element: <Chat /> }],
       
     },
 

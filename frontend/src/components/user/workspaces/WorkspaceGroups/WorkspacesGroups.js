@@ -30,7 +30,6 @@ const WorkspacesGroups = () => {
 
   //............................................Fetching Groups...................................
 
-  console.log("workspaceID", workspaceID);
   const [groups, setGroups] = useState([]);
 
   useEffect(() => {
@@ -64,7 +63,7 @@ const WorkspacesGroups = () => {
     dispatch(setGroupId(id));
     dispatch(setGroupName(group_name));
     navigate('chat')
-    console.log(id);
+
   };
 
   return (
