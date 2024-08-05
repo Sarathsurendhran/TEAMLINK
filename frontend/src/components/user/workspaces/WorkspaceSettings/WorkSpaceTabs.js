@@ -168,7 +168,7 @@ export default function WorkSpaceTabs() {
   const handleLaunch = (id, name) => {
     dispatch(setWorkspaceId(id));
     dispatch(setWorkspaceName(name));
-    navigate(`/workspacehome`);
+    navigate(`/workspacehome/chat`);
   };
 
   const filteredWorkspaces = workspaces.filter(

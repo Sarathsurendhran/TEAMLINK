@@ -63,11 +63,23 @@ class CreateWorkSpace(CreateAPIView):
 
     def perform_create(self, serializer):
         workspace = serializer.save(created_by=self.request.user, is_active=True)
-        WorkSpaceMembers.objects.create(
+        member_id = WorkSpaceMembers.objects.create(
             workspace=workspace,
             user=self.request.user,
             is_admin=True,
         )
+
+        # creating new group if the user create new workspace
+        group = WorkspaceGroups.objects.create(
+            group_name="General",
+            description="A space for general discussions and announcements.",
+            is_private=False,
+            created_by=member_id,
+            workspace_id=workspace.id,
+            topic="General discussions, updates, and announcements",
+        )
+
+        GroupMembers.objects.create(member_id=member_id.id, group_id=group.id)
 
 
 class ListWorkSpaces(ListAPIView):
@@ -254,8 +266,6 @@ class UpdateWorkspaceDescription(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class ListWorkSpaceUsers(APIView):
     def get(self, request):
         workspace_id = request.query_params.get("workspaceID")
@@ -265,22 +275,30 @@ class ListWorkSpaceUsers(APIView):
             return Response(
                 {"error": "workspaceID is required"}, status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         try:
             # Get users in the specified group
-            group_members = GroupMembers.objects.filter(group=group_id).values_list('member', flat=True)
-            
+            group_members = GroupMembers.objects.filter(group=group_id).values_list(
+                "member", flat=True
+            )
+
             # Get all workspace members
-            workspace_members = WorkSpaceMembers.objects.filter(workspace_id=workspace_id)
-            
+            workspace_members = WorkSpaceMembers.objects.filter(
+                workspace_id=workspace_id
+            )
+
             # Filter out users who are in the group
             users_to_exclude = group_members
-            users = [member for member in workspace_members if member.id not in users_to_exclude]
-            
+            users = [
+                member
+                for member in workspace_members
+                if member.id not in users_to_exclude
+            ]
+
             # Serialize the remaining users
             serializer = WorkspaceMemberSerializerForUserList(users, many=True)
             return Response({"users": serializer.data}, status=status.HTTP_200_OK)
-        
+
         except WorkSpaceMembers.DoesNotExist:
             return Response(
                 {"error": "Workspace not found"}, status=status.HTTP_404_NOT_FOUND

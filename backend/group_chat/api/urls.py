@@ -9,5 +9,7 @@ urlpatterns = [
     path("update-group-description/", views.UpdateGroupDescription.as_view(), name="edit-group-description" ),
     path("update-group-topic/", views.UpdateGroupTopic.as_view(), name="edit-group-topic" ),
     path("remove-group-member/", views.RemoveGroupMember.as_view(), name="remove-group-member" ),
-    path("add-member/", views.AddMembers.as_view(), name='add-member')
+    path("add-member/", views.AddMembers.as_view(), name='add-member'),
+
+    path("group-detail/<int:workspace_id>/", views.GroupDetail.as_view())
 ]

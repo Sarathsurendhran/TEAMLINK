@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 const ChatTextEditor = ({ connection }) => {
   const groupId = useSelector((state) => state.group.groupId);
   const { id, username } = useSelector((state) => state.authenticationUser);
+  const workspaceID = useSelector((state)=>state.workspace.workspaceId)
   const [message, setMessage] = useState("");
   const inputRef = useRef(null);
 

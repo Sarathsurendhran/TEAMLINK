@@ -23,7 +23,9 @@ class CreateGroupView(APIView):
 
         workspace_id = request.data.get("workspace_id")
 
-        user_instance = WorkSpaceMembers.objects.get(user=request.user.id, workspace_id=workspace_id)
+        user_instance = WorkSpaceMembers.objects.get(
+            user=request.user.id, workspace_id=workspace_id
+        )
         if serializer.is_valid():
             try:
                 group = WorkspaceGroups.objects.create(
@@ -58,7 +60,9 @@ class ListGroupsView(APIView):
 
     def get(self, request, workspace_id):
         try:
-            member = WorkSpaceMembers.objects.get(user=request.user.id, workspace_id=workspace_id)
+            member = WorkSpaceMembers.objects.get(
+                user=request.user.id, workspace_id=workspace_id
+            )
 
             groups = WorkspaceGroups.objects.filter(
                 id__in=GroupMembers.objects.filter(
@@ -68,7 +72,7 @@ class ListGroupsView(APIView):
 
             if groups.exists():
                 serializer = WorkspaceGroupSerializer(groups, many=True)
-               
+
                 return Response(
                     {"message": "success", "groups": serializer.data},
                     status=status.HTTP_200_OK,
@@ -108,7 +112,7 @@ class GetGroupDetails(APIView):
                     "message": "success",
                     "group": group_serializer.data,
                     "members": members_serializer.data,
-                    "group_creator":user.username
+                    "group_creator": user.username,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -117,13 +121,12 @@ class GetGroupDetails(APIView):
             return Response(
                 {"message": "Group not found"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
         except Exception as e:
             print(e)
             return Response(
                 {"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
-
 
 
 class UpdateGroupName(APIView):
@@ -138,13 +141,14 @@ class UpdateGroupName(APIView):
             group.save()
 
             return Response(
-                {"message": "Group Name Updated Successfully"}, status=status.HTTP_200_OK
+                {"message": "Group Name Updated Successfully"},
+                status=status.HTTP_200_OK,
             )
         except WorkspaceGroups.DoesNotExist:
             return Response(
                 {"message": "Group not found"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
         except Exception as e:
             print(e)
             return Response(
@@ -160,23 +164,23 @@ class UpdateGroupDescription(APIView):
         group_description = request.data.get("group_description")
         try:
             group = WorkspaceGroups.objects.get(id=group_id)
-            group.description =group_description
+            group.description = group_description
             group.save()
 
             return Response(
-                {"message": "Group Description Updated Successfully"}, status=status.HTTP_200_OK
+                {"message": "Group Description Updated Successfully"},
+                status=status.HTTP_200_OK,
             )
         except WorkspaceGroups.DoesNotExist:
             return Response(
                 {"message": "Group not found"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
         except Exception as e:
             print(e)
             return Response(
                 {"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
-
 
 
 class UpdateGroupTopic(APIView):
@@ -191,13 +195,14 @@ class UpdateGroupTopic(APIView):
             group.save()
 
             return Response(
-                {"message": "Group Topic Updated Successfully"}, status=status.HTTP_200_OK
+                {"message": "Group Topic Updated Successfully"},
+                status=status.HTTP_200_OK,
             )
         except WorkspaceGroups.DoesNotExist:
             return Response(
                 {"message": "Group not found"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
         except Exception as e:
             print(e)
             return Response(
@@ -213,7 +218,9 @@ class RemoveGroupMember(APIView):
         workspace_member_id = request.data.get("member_id")
 
         try:
-            group_member = GroupMembers.objects.get(group_id=group_id, member=workspace_member_id)
+            group_member = GroupMembers.objects.get(
+                group_id=group_id, member=workspace_member_id
+            )
             group_member.delete()
 
             return Response(
@@ -228,7 +235,6 @@ class RemoveGroupMember(APIView):
             return Response(
                 {"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
-        
 
 
 class AddMembers(APIView):
@@ -241,22 +247,46 @@ class AddMembers(APIView):
 
         # Validate parameters
         if not group_id or not workspace_id or not workspace_member_id:
-            return Response({"error": "Missing required parameters."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Missing required parameters."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             group = get_object_or_404(WorkspaceGroups, id=group_id)
-            workspace_member = get_object_or_404(WorkSpaceMembers, id=workspace_member_id)
+            workspace_member = get_object_or_404(
+                WorkSpaceMembers, id=workspace_member_id
+            )
 
-            group_data = GroupMembers.objects.create(group=group, member=workspace_member)
+            group_data = GroupMembers.objects.create(
+                group=group, member=workspace_member
+            )
 
-            return Response({"message": "Member added successfully.", "group_data": group_data.id}, status=status.HTTP_201_CREATED)
-        
+            return Response(
+                {"message": "Member added successfully.", "group_data": group_data.id},
+                status=status.HTTP_201_CREATED,
+            )
+
         except WorkspaceGroups.DoesNotExist:
-            return Response({"message": "Group not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        except WorkSpaceMembers.DoesNotExist:
-            return Response({"message": "Workspace member not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        except Exception as e:
-            return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"message": "Group not found."}, status=status.HTTP_404_NOT_FOUND
+            )
 
+        except WorkSpaceMembers.DoesNotExist:
+            return Response(
+                {"message": "Workspace member not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        except Exception as e:
+            return Response(
+                {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GroupDetail(APIView):
+    def get(self, request, workspace_id):
+        try:
+            group = WorkspaceGroups.objects.filter(workspace_id=workspace_id).first()
+        except WorkspaceGroups.DoesNotExist:
+            print("workspace not found")

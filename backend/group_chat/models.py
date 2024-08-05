@@ -28,9 +28,11 @@ class GroupMembers(models.Model):
 
 
 class GroupChatMessages(models.Model):
-    sender = models.ForeignKey(WorkSpaceMembers, on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.CharField(default=" ", null=True, blank=True)
     time_stamp = models.DateTimeField(default=timezone.now)
+    group = models.CharField(max_length=100, null=True)
+    type = models.CharField(default='text_message')
 
     def __str__(self):
         return f"{self.sender}:{self.message}"

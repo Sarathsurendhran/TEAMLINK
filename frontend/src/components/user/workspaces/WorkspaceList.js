@@ -48,7 +48,7 @@ const WorkSpaces = () => {
   const handleLaunch = async (id, name) => {
     dispatch(setWorkspaceId(id));
     dispatch(setWorkspaceName(name))
-    navigate(`/workspacehome`);
+    navigate(`/workspacehome/chat`);
   };
 
   const handleLogout = (event) => {

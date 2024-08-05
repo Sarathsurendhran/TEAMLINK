@@ -62,8 +62,7 @@ const WorkspacesGroups = () => {
   const handleGroupLaunch = (id, group_name) => {
     dispatch(setGroupId(id));
     dispatch(setGroupName(group_name));
-    navigate('chat')
-
+    navigate("chat");
   };
 
   return (

@@ -24,6 +24,8 @@ from .serializers import (
 from workspaces.models import WorkSpaceMembers
 from rest_framework.permissions import IsAuthenticated
 
+from group_chat.models import WorkspaceGroups, GroupMembers
+
 
 @api_view(["GET"])
 def getRoutes(request):
@@ -145,7 +147,9 @@ class LoginView(APIView):
 
             # Workspace handling
             workspaces = False
+            workspace_member = None
             if workspace_id:
+               
                 """
                 checking the user is already in the workspaces if not creating a user
 
@@ -155,15 +159,41 @@ class LoginView(APIView):
                     if not WorkSpaceMembers.objects.filter(
                         user_id=user.id, workspace_id=workspace.id
                     ):
-                        WorkSpaceMembers.objects.create(
+                        workspace_member = WorkSpaceMembers.objects.create(
                             is_admin=False,
                             user_id=user.id,
                             workspace_id=workspace.id,
+                        )
+                    else:
+                        workspace_member = WorkSpaceMembers.objects.get(
+                            user_id=user.id, workspace_id=workspace.id
                         )
                 except WorkSpaces.DoesNotExist:
                     print("Workspace does not exist")
                 except Exception as e:
                     print(f"Error: {e}")
+
+                try:
+                    """
+                    checking if the user is already in the general group if not adding the user
+                    """
+                    
+                    workspace = WorkSpaces.objects.get(id=workspace_id)
+                    group = WorkspaceGroups.objects.filter(
+                        workspace_id=workspace.id
+                    ).first()
+                    if not GroupMembers.objects.filter(
+                        group_id=group.id, member_id=workspace_member.id
+                    ):
+                        GroupMembers.objects.create(
+                            group_id=group.id, member_id=workspace_member.id
+                        )
+
+                except WorkSpaces.DoesNotExist:
+                    print("Workspace does not exist in group")
+
+                except WorkspaceGroups.DoesNotExist:
+                    print("Workspace group does not exsist")
 
             try:
                 # if the user is in the workspace changing the workspace flag True so the user can redirect to different page in frontend

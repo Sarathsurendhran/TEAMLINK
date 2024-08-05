@@ -10,6 +10,9 @@ const Chat = () => {
   const [connection, setConnection] = useState(null);
   const chatContainerRef = useRef(null);
   const { id, username } = useSelector((state) => state.authenticationUser);
+  
+
+
 
   useEffect(() => {
     if (groupId) {
