@@ -287,6 +287,11 @@ class AddMembers(APIView):
 class GroupDetail(APIView):
     def get(self, request, workspace_id):
         try:
-            group = WorkspaceGroups.objects.filter(workspace_id=workspace_id).first()
+            group_data = WorkspaceGroups.objects.filter(
+                workspace_id=workspace_id
+            ).first()
+            serialized_data = WorkspaceGroupSerializer(group_data)
+            return Response(serialized_data.data, status=status.HTTP_200_OK)
         except WorkspaceGroups.DoesNotExist:
             print("workspace not found")
+            return Response(status=status.HTTP_400_BAD_REQUEST)

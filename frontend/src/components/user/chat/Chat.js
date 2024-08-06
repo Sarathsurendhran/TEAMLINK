@@ -1,34 +1,74 @@
 import React, { useState, useEffect, useRef } from "react";
 import ChatTextEditor from "./ChatTextEditor";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { w3cwebsocket } from "websocket";
+import { setGroupId, setGroupName } from "../../../Redux/Groups/GroupSlice";
+import axios from "axios";
 
 const Chat = () => {
+  const baseURL = process.env.REACT_APP_baseURL;
+  const dispatch = useDispatch();
   const groupId = useSelector((state) => state.group.groupId);
+  const workspaceID = useSelector((state) => state.workspace.workspaceId);
   const webSocketURL = process.env.REACT_APP_webSocketURL;
   const [chatMessages, setChatMessages] = useState([]);
   const [connection, setConnection] = useState(null);
   const chatContainerRef = useRef(null);
   const { id, username } = useSelector((state) => state.authenticationUser);
-  
 
+  //.............. fetechig the general group...........
 
+  const fetchGroupData = async () => {
+    try {
+      const response = await axios.get(
+        `${baseURL}group/group-detail/${workspaceID}/`
+      );
+      // Handle the response data
+      // console.log(response.data);
+
+      dispatch(setGroupId(response.data.id));
+      dispatch(setGroupName(response.data.group_name));
+    } catch (error) {
+      // Handle errors
+      console.error("Error fetching group data:", error);
+    }
+  };
 
   useEffect(() => {
+    fetchGroupData();
+  }, [workspaceID]);
+
+  let reconnectTimeout;
+
+  console.log("groupId", groupId, "workspaceID", workspaceID);
+
+  // useEffect(() => {
+  //   setChatMessages([]);
+  // }, [workspaceID]);
+
+  useEffect(() => {
+    // Clean up the previous WebSocket connection
+    if (connection) {
+      connection.close();
+      setConnection(null);
+    }
+
+    // Clear messages when workspace changes
+    setChatMessages([]);
     if (groupId) {
-      setChatMessages([]);
+      // setChatMessages([]);
       connectToWebSocket();
     }
     return () => {
       if (connection) {
         connection.close();
       }
+      clearTimeout(reconnectTimeout);
     };
-  }, [groupId]);
+  }, [groupId, workspaceID]);
 
   // WebSocket connection
   const connectToWebSocket = () => {
-
     const newConnection = new w3cwebsocket(
       `${webSocketURL}ws/group-chat/${groupId}/`
     );
@@ -54,9 +94,12 @@ const Chat = () => {
     };
 
     newConnection.onclose = () => {
-      console.log("WebSocket client disconnected, attempting to reconnect...");
-      setTimeout(connectToWebSocket, 2000); // Reconnect after 2 seconds
+      console.log("WebSocket connection closed, attempting to reconnect...");
+      // reconnectTimeout = setTimeout(() => {
+      //   connectToWebSocket();
+      // }, 2000); // Attempt to reconnect after 2 seconds
     };
+
 
     newConnection.onerror = (error) => {
       console.error("WebSocket error:", error);

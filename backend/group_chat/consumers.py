@@ -9,8 +9,8 @@ from users.models import User
 
 class GroupChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        group_id = self.scope["url_route"]["kwargs"]["group_id"]
-        self.room_group_name = f"chat_{group_id}"
+        self.group_id = self.scope["url_route"]["kwargs"]["group_id"]
+        self.room_group_name = f"chat_{self.group_id}"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
@@ -94,7 +94,8 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
     # function to getting the previous messages in the database
     @database_sync_to_async
     def get_existing_messages(self):
-        messages = GroupChatMessages.objects.filter(group=self.room_group_name)
+        messages = GroupChatMessages.objects.filter(group=self.group_id)
+        print("self.room_group_name", self.group_id)
         return [
             {
                 "message": message.message,
@@ -167,7 +168,7 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
             GroupChatMessages.objects.create(
                 sender=sender,
                 message=message,
-                group=self.room_group_name,
+                group=self.group_id,
             )
             print("Message saved to the database")
         else:

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ProfileModal from "../chat/ProfileModal";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Avatar from "@mui/material/Avatar";
-import axios from "axios";
+
+
 
 const WorkspaceInnerHeader = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -11,26 +12,9 @@ const WorkspaceInnerHeader = () => {
   const profileImage = useSelector((state) => state.userProfile.profileImage);
   const groupName = useSelector((state) => state.group.groupName);
   const workspaceID = useSelector((state)=>state.workspace.workspaceId)
-  const baseURL = process.env.REACT_APP_baseURL
 
 
 
-  //.............. fetechig the general group...........
-
-  const fetchGroupData = async () => {
-    try {
-      const response = await axios.get(`${baseURL}group/group-detail/${workspaceID}/`);
-      // Handle the response data
-      console.log(response.data);
-    } catch (error) {
-      // Handle errors
-      console.error("Error fetching group data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchGroupData();
-  }, []); 
 
   return (
     <>
