@@ -7,8 +7,13 @@ import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ProfileTab from "./ProfileTabs";
+import { useSelector } from "react-redux";
 
-const ProfileModal = ({ open, handleClose}) => {
+
+const ProfileModal = ({ open, handleClose }) => {
+  const groupName = useSelector((state)=>state.group.groupName)
+  console.log(groupName)
+
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -43,17 +48,18 @@ const ProfileModal = ({ open, handleClose}) => {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <Typography
+            <div
               id="transition-modal-title"
-              className="bg-white h-12"
+              className=" text-white font-bold text-2xl font-serif ml-1 mt-1 border-b-2 border-gray-400 pb-2"
               variant="h6"
               component="h2"
             >
-              Text in a modal
-            </Typography>
+              {/* {groupName} */}
+              Group Settings
+            </div>
 
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-               <ProfileTab />
+              <ProfileTab />
             </Typography>
           </Box>
         </Fade>

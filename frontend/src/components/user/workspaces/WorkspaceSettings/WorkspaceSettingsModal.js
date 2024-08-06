@@ -73,14 +73,15 @@ const WorkspaceSettingsModal = () => {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <Typography
+            <div
               id="transition-modal-title"
-              className="bg-white h-14"
+              className="text-white font-bold text-2xl font-serif ml-1 mt-2 border-b-2 border-gray-400 pb-2"
               variant="h6"
               component="h2"
             >
-              Text in a modal
-            </Typography>
+              Workspace Settings
+            
+            </div>
 
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
               <PrivateRoutes>

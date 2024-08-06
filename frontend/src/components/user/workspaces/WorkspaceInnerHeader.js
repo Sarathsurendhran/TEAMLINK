@@ -18,19 +18,20 @@ const WorkspaceInnerHeader = () => {
 
   return (
     <>
-      <nav className="fixed top-6 left-0 right-0 flex-1 p-2 bg-blue-950 h-16 ml-auto max-w-[78rem] ">
+      <nav className="fixed top-6 left-0 right-0 flex-1 p-2 bg-blue-950 h-14 ml-auto max-w-[78rem] flex items-center ">
         <div className="flex justify-start items-center ">
-          <div
+          {/* <div
             className="w-12 h-12  ml-16 bg-blue-500 rounded-full border cursor-pointer"
             onClick={handleOpen}
-          ></div>
+          ></div> */}
+          <div className="w-12"></div>
           {/* <Avatar src="/broken-image.jpg" /> */}
 
           <h3
-            className="text-white ml-3 text-xl font-sans font-bold cursor-pointer"
+            className="text-white ml-3 text-2xl font-sans font-bold cursor-pointer"
             onClick={handleOpen}
           >
-            {groupName}
+            # {groupName}
           </h3>
         </div>
       </nav>

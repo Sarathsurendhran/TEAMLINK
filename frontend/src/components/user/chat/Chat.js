@@ -38,13 +38,7 @@ const Chat = () => {
     fetchGroupData();
   }, [workspaceID]);
 
-  let reconnectTimeout;
 
-  console.log("groupId", groupId, "workspaceID", workspaceID);
-
-  // useEffect(() => {
-  //   setChatMessages([]);
-  // }, [workspaceID]);
 
   useEffect(() => {
     // Clean up the previous WebSocket connection
@@ -56,14 +50,13 @@ const Chat = () => {
     // Clear messages when workspace changes
     setChatMessages([]);
     if (groupId) {
-      // setChatMessages([]);
       connectToWebSocket();
     }
     return () => {
       if (connection) {
         connection.close();
       }
-      clearTimeout(reconnectTimeout);
+      
     };
   }, [groupId, workspaceID]);
 
@@ -95,9 +88,6 @@ const Chat = () => {
 
     newConnection.onclose = () => {
       console.log("WebSocket connection closed, attempting to reconnect...");
-      // reconnectTimeout = setTimeout(() => {
-      //   connectToWebSocket();
-      // }, 2000); // Attempt to reconnect after 2 seconds
     };
 
 
