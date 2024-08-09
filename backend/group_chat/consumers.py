@@ -14,7 +14,7 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-         # Send existing messages to the client
+        # Send existing messages to the client
         await self.send_existing_messages()
 
     async def disconnect(self, close_code):
@@ -28,9 +28,12 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         time = text_data_json.get("time", "unknown")
         type = text_data_json.get("type", "text_message")
 
+        if type == "video_call":
+            await self.video_link_receive(username, sender)
 
+        if type == "audio_call":
+            await self.audio_link_receive(username, sender)
 
-        print("sendererr", sender)
         # Save the message to the database
         await self.save_message(sender, message)
 
@@ -106,10 +109,8 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
             }
             for message in messages
         ]
-    
 
     async def save_message(self, sender, message):
-        
         """
         Asynchronously saves a message to the database.
 
@@ -125,8 +126,6 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
             await self.save_message_to_db(sender, message)
         else:
             print("sender not found")
-
-
 
     @database_sync_to_async
     def get_member_instance(self, member_id):
@@ -173,3 +172,49 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
             print("Message saved to the database")
         else:
             print("Sender not found")
+
+
+# --------------------------------------------------for video and audio call-----------------------------------------#
+
+
+    async def video_link_receive(self, username, sender):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "video_call_link",
+                "data": {
+                    "sender": sender,
+                    "username": username,
+                },
+            },
+        )
+
+
+    async def video_call_link(self, event):
+        sender = event["data"]["sender"]
+        username = event["data"]["username"]
+        await self.send(
+            text_data=json.dumps(
+                {"type": "video_call", "sender": sender, "username": username}
+            )
+        )
+
+
+    async def audio_link_receive(self, username, sender):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "audio_call_link",
+                "data": {"username": username, "sender": sender},
+            },
+        )
+
+
+    async def audio_call_link(self, event):
+        username = event["data"]["username"]
+        sender = event["data"]["sender"]
+        await self.send(
+            text_data=json.dumps(
+                {"type": "audio_call", "username": username, "sender": sender}
+            )
+        )

@@ -4,10 +4,17 @@ import { useSelector, useDispatch } from "react-redux";
 import { w3cwebsocket } from "websocket";
 import { setGroupId, setGroupName } from "../../../Redux/Groups/GroupSlice";
 import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import VideoCallAlert from "../Group/GroupCall/GroupVideoCallAlert";
+import AudioCallAlert from "../Group/GroupCall/GroupAudioCallAlert";
+
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 const Chat = () => {
   const baseURL = process.env.REACT_APP_baseURL;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const groupId = useSelector((state) => state.group.groupId);
   const workspaceID = useSelector((state) => state.workspace.workspaceId);
   const webSocketURL = process.env.REACT_APP_webSocketURL;
@@ -15,6 +22,14 @@ const Chat = () => {
   const [connection, setConnection] = useState(null);
   const chatContainerRef = useRef(null);
   const { id, username } = useSelector((state) => state.authenticationUser);
+
+  const [videoCallAlert, setVideoCallAlert] = useState(false);
+  const [audioCallAlert, setAudioCallAlert] = useState(false);
+
+  const location = useLocation();
+  const { startVideoCall } = location.state || {};
+
+  const { startAudioCall } = location.state || {};
 
   //.............. fetechig the general group...........
 
@@ -38,8 +53,6 @@ const Chat = () => {
     fetchGroupData();
   }, [workspaceID]);
 
-
-
   useEffect(() => {
     // Clean up the previous WebSocket connection
     if (connection) {
@@ -56,7 +69,6 @@ const Chat = () => {
       if (connection) {
         connection.close();
       }
-      
     };
   }, [groupId, workspaceID]);
 
@@ -73,13 +85,23 @@ const Chat = () => {
       try {
         const data = JSON.parse(message.data);
 
-        console.log("Received data:", data);
+        // console.log("Received data:", data);
 
-        if (data.username && data.message) {
+        if (data.type === "video_call") {
+          if (data.sender === id) {
+            navigate(`/group-video/${groupId}/`);
+          } else {
+            setVideoCallAlert(true);
+          }
+        } else if (data.type === "audio_call") {
+          if (data.sender === id) {
+            navigate(`/audio-call/${groupId}/`);
+          } else {
+            setAudioCallAlert(true);
+          }
+        } else {
           setChatMessages((prevMessages) => [...prevMessages, data]);
           scrollToBottom();
-        } else {
-          console.error("Invalid message format:", data);
         }
       } catch (error) {
         console.error("Error parsing message data:", error);
@@ -90,9 +112,12 @@ const Chat = () => {
       console.log("WebSocket connection closed, attempting to reconnect...");
     };
 
-
     newConnection.onerror = (error) => {
       console.error("WebSocket error:", error);
+      newConnection.close();
+    };
+
+    return () => {
       newConnection.close();
     };
   };
@@ -108,13 +133,52 @@ const Chat = () => {
     scrollToBottom();
   }, [chatMessages]);
 
+  //************************************* call ************************************/
+
+  const videoCall = () => {
+    const message = {
+      message: "started video call",
+      type: "video_call",
+      sender: id,
+      username: username,
+    };
+
+    if (connection && connection.readyState === connection.OPEN) {
+      connection.send(JSON.stringify(message));
+    } else {
+      console.log("Websocket is not open");
+    }
+  };
+
+  if (startVideoCall) {
+    videoCall();
+  }
+
+  const audioCall = () => {
+    const message = {
+      message: "started audio call",
+      type: "audio_call",
+      sender: id,
+      username: username,
+    };
+    if (connection && connection.readyState === connection.OPEN) {
+      connection.send(JSON.stringify(message));
+    } else {
+      console.log("Websocket is not open");
+    }
+  };
+
+  if (startAudioCall) {
+    audioCall();
+  }
+
   return (
     <>
       <div
         className="h-screen bg-[#1f1e1f] flex ml-auto max-w-[76rem] flex-col overflow-y-scroll"
         ref={chatContainerRef}
       >
-        <div>
+         <div>
           <div className="flex-1 px-4 py-2 mt-24 mb-28 max-h-full ">
             {chatMessages.length === 0 && (
               <div className="text-white">No messages yet...</div>
@@ -129,13 +193,51 @@ const Chat = () => {
                 <div className="max-w-sm">
                   <div className="text-white font-medium">{msg.username}</div>
                   <div className="bg-gray-800 text-white rounded-lg p-2 shadow mb-2 text-lg">
-                    {msg.message}
+                    {msg.message.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
+                      <img
+                        src={msg.message}
+                        alt="Message Content"
+                        className="max-w-full h-auto rounded"
+                      />
+                    ) : msg.message.match(/\.(docx|pdf|txt)$/) ? (
+                      <div className="flex items-center">
+                        <span className="material-icons mr-2">
+                          <InsertDriveFileIcon />
+                        </span>
+                        <a
+                          href={msg.message}
+                          download
+                          className="text-blue-500 underline"
+                        >
+                          Download File
+                        </a>
+                      </div>
+                    ) : (
+                      msg.message
+                    )}
                   </div>
                 </div>
+
+                
               </div>
             ))}
           </div>
-        </div>
+        </div> 
+
+  
+
+        {videoCallAlert && (
+          <VideoCallAlert
+            setVideoCallAlert={setVideoCallAlert}
+            roomId={groupId}
+          />
+        )}
+        {audioCallAlert && (
+          <AudioCallAlert
+            setAudioCallAlert={setAudioCallAlert}
+            roomId={groupId}
+          />
+        )}
       </div>
       <ChatTextEditor connection={connection} />
     </>

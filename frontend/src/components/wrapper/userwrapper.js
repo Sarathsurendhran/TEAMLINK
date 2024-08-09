@@ -18,6 +18,9 @@ import WorkspaceIsblocked from "./checking_workspace_isblocked";
 import { useRoutes } from "react-router-dom";
 import Chat from "../user/chat/Chat";
 
+import GroupVideoCall from "../user/Group/GroupCall/GroupVideoCall";
+import GroupAudioCall from "../user/Group/GroupCall/GroupAudioCall";
+
 const UserWrapper = () => {
   const authentication_user = useSelector((state) => state.authentication_user);
   const dispatch = useDispatch();
@@ -52,7 +55,6 @@ const UserWrapper = () => {
         </PrivateRoutes>
       ),
       children: [{ path: "chat", element: <Chat /> }],
-      
     },
 
     {
@@ -98,6 +100,24 @@ const UserWrapper = () => {
       ),
     },
     { path: "/otp", element: <OTP /> },
+
+    {
+      path: "/group-video/:roomId",
+      element: (
+        <PrivateRoutes>
+          <GroupVideoCall />
+        </PrivateRoutes>
+      ),
+    },
+    {
+      path: "/audio-call/:roomId",
+      element: (
+        <PrivateRoutes>
+          <GroupAudioCall />
+        </PrivateRoutes>
+      ),
+    },
+
   ]);
 
   return routes;
