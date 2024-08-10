@@ -8,7 +8,7 @@ class CreateGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkspaceGroups
-        fields = ['workspace_id', 'group_name', 'description', 'topic', 'is_private']
+        fields = ["workspace_id", "group_name", "description", "topic", "is_private"]
 
     def validate_workspace_id(self, value):
         try:
@@ -18,8 +18,8 @@ class CreateGroupSerializer(serializers.ModelSerializer):
         return value
 
     def validate_user(self, data):
-        workspace_id = data.get('workspace_id')
-        user_id = self.context['request'].user.id
+        workspace_id = data.get("workspace_id")
+        user_id = self.context["request"].user.id
         try:
             member = WorkSpaceMembers.objects.get(
                 user_id=user_id, workspace_id=workspace_id
@@ -29,7 +29,10 @@ class CreateGroupSerializer(serializers.ModelSerializer):
         return user_id
 
     def validate_group_name(self, value):
-        if WorkspaceGroups.objects.filter(group_name=value).exists():
+        workspace_id = self.initial_data.get("workspace_id")
+        if WorkspaceGroups.objects.filter(
+            group_name=value, workspace_id=workspace_id
+        ).exists():
             raise serializers.ValidationError("Group name already exists")
         return value
 
@@ -37,13 +40,13 @@ class CreateGroupSerializer(serializers.ModelSerializer):
 class WorkspaceGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkspaceGroups
-        fields = '__all__'
+        fields = "__all__"
 
 
 class GroupMembersSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='member.user.username', read_only=True)
-    user_id = serializers.IntegerField(source='member.user.id', read_only=True)
+    username = serializers.CharField(source="member.user.username", read_only=True)
+    user_id = serializers.IntegerField(source="member.user.id", read_only=True)
+
     class Meta:
         model = GroupMembers
-        fields = '__all__'
-
+        fields = "__all__"

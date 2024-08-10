@@ -6,6 +6,8 @@ import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 import VideoCallOutlinedIcon from "@mui/icons-material/VideoCallOutlined";
 import AddIcCallOutlinedIcon from "@mui/icons-material/AddIcCallOutlined";
 import { useNavigate } from "react-router-dom";
+import { Video } from 'lucide-react';
+import { Phone } from 'lucide-react';
 
 const WorkspaceInnerHeader = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -53,14 +55,14 @@ const WorkspaceInnerHeader = () => {
         <div className="w-12"></div>
         <div className="w-12"></div>
 
-        <div className="text-white ">
+        <div className="text-white flex items-center">
           <button title="Video Call" onClick={handleVideoCall}>
-            <VideoCallOutlinedIcon style={{ fontSize: 40 }} />
+            <Video size={30} />
           </button>
-
+          {/* style={{  marginTop: "20px",  }} */}
           <button title="Voice Call" onClick={handleAudioCall}>
-            <AddIcCallOutlinedIcon
-              style={{ fontSize: 27, marginLeft: "20px" }}
+            <Phone size={22}
+              style={{  marginLeft: "20px",  }}
             />
           </button>
         </div>

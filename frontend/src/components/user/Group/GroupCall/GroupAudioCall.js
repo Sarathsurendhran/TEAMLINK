@@ -13,14 +13,13 @@ const GroupAudioCall = () => {
   const zpRef = useRef(null);
 
   const handleLeaveRoom = () => {
-    console.log('Leaving room...');
+    console.log("Leaving room...");
     if (zpRef.current) {
       zpRef.current.destroy(); // Destroy the ZegoUIKitPrebuilt instance
       zpRef.current = null; // Reset the reference
     }
     navigate(`/workspacehome/chat`);
   };
-
 
   useEffect(() => {
     const MyVideoCallMeet = async () => {
@@ -59,7 +58,9 @@ const GroupAudioCall = () => {
 
   return (
     <>
-      <div className="w-full h-full" ref={containerRef} />
+      <div className="w-screen h-screen">
+        <div className="w-full h-full" ref={containerRef} />
+      </div>
     </>
   );
 };
