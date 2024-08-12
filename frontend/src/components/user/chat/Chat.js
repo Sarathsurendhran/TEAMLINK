@@ -11,6 +11,9 @@ import AudioCallAlert from "../Group/GroupCall/GroupAudioCallAlert";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
+import useSound from 'use-sound';
+
+
 const Chat = () => {
   const baseURL = process.env.REACT_APP_baseURL;
   const dispatch = useDispatch();
@@ -172,13 +175,15 @@ const Chat = () => {
     audioCall();
   }
 
+
+
   return (
     <>
       <div
         className="h-screen bg-[#1f1e1f] flex ml-auto max-w-[76rem] flex-col overflow-y-scroll"
         ref={chatContainerRef}
       >
-         <div>
+        <div>
           <div className="flex-1 px-4 py-2 mt-24 mb-28 max-h-full ">
             {chatMessages.length === 0 && (
               <div className="text-white">No messages yet...</div>
@@ -199,7 +204,28 @@ const Chat = () => {
                         alt="Message Content"
                         className="max-w-full h-auto rounded"
                       />
-                    ) : msg.message.match(/\.(docx|pdf|txt)$/) ? (
+                    ) : msg.message.match(/\.(mp3|wav|ogg|m4a)$/) ? (
+                      <>
+                        <audio
+                          key={index}
+                          controls
+                          className="max-w-full h-auto rounded"
+                        >
+                          <source
+                            src={msg.message}
+                            type={`audio/${msg.message.split(".").pop()}`}
+                          />
+                        </audio>
+                      </>
+                    ) : msg.message.match(/\.(mp4|webm|ogg|avi)$/) ? (
+                      <video controls className="max-w-full h-auto rounded">
+                        <source
+                          src={msg.message}
+                          type={`video/${msg.message.split(".").pop()}`}
+                        />
+                        Your browser does not support the video element.
+                      </video>
+                    ) : msg.message.match(/\.(docx|pdf|txt|xlsx|xls)$/) ? (
                       <div className="flex items-center">
                         <span className="material-icons mr-2">
                           <InsertDriveFileIcon />
@@ -209,7 +235,8 @@ const Chat = () => {
                           download
                           className="text-blue-500 underline"
                         >
-                          Download File
+                          {msg.message.split("/").pop()}{" "}
+                          {/* Display file name */}
                         </a>
                       </div>
                     ) : (
@@ -217,14 +244,10 @@ const Chat = () => {
                     )}
                   </div>
                 </div>
-
-                
               </div>
             ))}
           </div>
-        </div> 
-
-  
+        </div>
 
         {videoCallAlert && (
           <VideoCallAlert

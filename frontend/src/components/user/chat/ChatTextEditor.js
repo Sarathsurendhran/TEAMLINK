@@ -45,7 +45,7 @@ const ChatTextEditor = ({ connection }) => {
   const isButtonDisabled = !message.trim();
 
 
-  const handleImageUpload = async (e) => {
+  const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
 
     if (!selectedFile) {
@@ -54,11 +54,11 @@ const ChatTextEditor = ({ connection }) => {
 
     setIsLoading(true);
 
-    if (selectedFile.size > 2 * 1024 * 1024) { // Check for 2 MB limit
-      toast.error("You can only send image less than 2 MB");
-      setIsLoading(false);
-      return; // Prevent further processing
-    }
+    // if (selectedFile.size > 2 * 1024 * 1024) { // Check for 2 MB limit
+    //   toast.error("You can only send Files less than 2 MB");
+    //   setIsLoading(false);
+    //   return; 
+    // }
 
     let formData = new FormData();
     formData.append("file", selectedFile);
@@ -119,7 +119,7 @@ const ChatTextEditor = ({ connection }) => {
             type="file"
             // accept="image/*"
             className="hidden"
-            onChange={handleImageUpload}
+            onChange={handleFileUpload}
           />
           <AttachFileIcon className="text-white" style={{ fontSize: 30 }} />
           
