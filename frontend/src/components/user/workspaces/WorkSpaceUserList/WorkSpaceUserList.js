@@ -8,6 +8,7 @@ import ArrowDropDownSharpIcon from "@mui/icons-material/ArrowDropDownSharp";
 import ArrowRightSharpIcon from "@mui/icons-material/ArrowRightSharp";
 import PeopleIcon from "@mui/icons-material/People";
 import { setWorkspaceAdmin } from "../../../../Redux/WorkspaceID/workspaceSlice";
+import { setSelectedUser, setselectedUserName } from "../../../../Redux/SelectedUser/SelectedUser";
 
 const WorkSpaceUserList = () => {
   const [usersOpen, setUsersOpen] = useState(false);
@@ -24,9 +25,14 @@ const WorkSpaceUserList = () => {
     ? authenticated_user.id
     : null;
 
+
   const toggleUsersAccordion = () => {
     setUsersOpen(!usersOpen);
   };
+
+  const selectedUser = useSelector((state) => state.selectedUser.selectedUser);
+  // const selectedUserName = useSelector((state) => state.selectedUser.selectedUserName);
+
 
   //.................. feteching all the data of the current workspace and user............
   useEffect(() => {
@@ -60,15 +66,19 @@ const WorkSpaceUserList = () => {
         const members_data = res.data.members_data;
         const members = Array.isArray(members_data) ? members_data : [];
         setMenuItems(members);
-        // const checkIsAdmin = members.some((member)=>member.user.id === authenticated_user_id && member.is_admin)
-        // if (checkIsAdmin){
-        //   setWorkspaceAdmin(true)
-        // }
+      
       }
     } catch (error) {
       console.error("Error launching workspace:", error);
     }
-  };
+  };  
+
+  
+  const handleSelectedUser = (user_id, username) => {
+    dispatch(setSelectedUser(user_id))
+    dispatch(setselectedUserName(username))
+    navigate('one-to-one-chat')
+  }
 
   return (
     <div>
@@ -115,9 +125,10 @@ const WorkSpaceUserList = () => {
               >
                 <button
                   type="button"
-                  className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-500"
+                  className={`hs-accordion-toggle mt-1 hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-500 ${ selectedUser === member.user.id ? "bg-gray-500" : "text-white"}`}
+                  onClick={() => handleSelectedUser(member.user.id, member.user.username )}
                 >
-                  <div className="flex items-center">
+                  <div className="flex items-center" >
                     <span className="mr-10">{member.user.username}</span>
                     {member.is_admin && (
                       <span className="text-red-500 font-sm mr-3">admin</span>

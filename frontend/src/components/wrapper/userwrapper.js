@@ -16,7 +16,8 @@ import ThreeDBackground from "../vantajs/ThreeDBackground";
 import UserCheckingWrapper from "./userchecking_wrapper";
 import WorkspaceIsblocked from "./checking_workspace_isblocked";
 import { useRoutes } from "react-router-dom";
-import Chat from "../user/chat/Chat";
+import Chat from "../user/chat/GroupChat";
+import OneToOneChat from "../user/chat/OneToOneChat";
 
 import GroupVideoCall from "../user/Group/GroupCall/GroupVideoCall";
 import GroupAudioCall from "../user/Group/GroupCall/GroupAudioCall";
@@ -54,7 +55,10 @@ const UserWrapper = () => {
           </WorkspaceIsblocked>
         </PrivateRoutes>
       ),
-      children: [{ path: "chat", element: <Chat /> }],
+      children: [
+        { path: "chat", element: <Chat /> },
+        { path: "one-to-one-chat", element: <OneToOneChat /> },
+      ],
     },
 
     {
@@ -117,7 +121,6 @@ const UserWrapper = () => {
         </PrivateRoutes>
       ),
     },
-
   ]);
 
   return routes;

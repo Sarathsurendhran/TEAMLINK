@@ -15,6 +15,7 @@ import storage from "redux-persist/lib/storage";
 import { encryptTransform } from "redux-persist-transform-encrypt";
 import groupReducer from "../Redux/Groups/GroupSlice";
 import userProfileReducer from "./UserProfile/userProfileSlice";
+import SelectedUser from "./SelectedUser/SelectedUser";
 
 // Configure the encryption transform for workspace
 const encryptor = encryptTransform({
@@ -44,6 +45,12 @@ const userProfilePersistConfig = {
   transforms: [encryptor],
 };
 
+const selectedUserPersistConfig = {
+  key: "selectedUser",
+  storage,
+  transforms: [encryptor],
+};
+
 // Persisted reducers
 const persistedWorkspaceReducer = persistReducer(
   workspacePersistConfig,
@@ -55,12 +62,18 @@ const persistedUserProfileReducer = persistReducer(
   userProfileReducer
 );
 
+const persistedSelectedUser = persistReducer(
+  selectedUserPersistConfig,
+  SelectedUser
+);
+
 // Create a root reducer combining persisted and non-persisted reducers
 const rootReducer = combineReducers({
   authenticationUser: authenticationSliceReducer, // Non-persisted
   workspace: persistedWorkspaceReducer, // Persisted with encryption
   group: persistedGroupReducer,
   userProfile: persistedUserProfileReducer,
+  selectedUser: persistedSelectedUser,
 });
 
 // Create store with combined reducer

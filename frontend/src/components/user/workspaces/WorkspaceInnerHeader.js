@@ -18,6 +18,11 @@ const WorkspaceInnerHeader = () => {
   const profileImage = useSelector((state) => state.userProfile.profileImage);
   const groupName = useSelector((state) => state.group.groupName);
   const workspaceID = useSelector((state) => state.workspace.workspaceId);
+
+
+  const selectedUser = useSelector((state) => state.selectedUser.selectedUser);
+  const selectedUserName = useSelector((state) => state.selectedUser.selectedUserName);
+
   const [startVideoCall, setStartVideoCall] = useState(false);
   const [startAudioCall, setStartAudioCall] = useState(false);
 
@@ -33,22 +38,18 @@ const WorkspaceInnerHeader = () => {
     navigate("/workspacehome/chat", { state: { startAudioCall: newStartAudioCall } });
   };
   
+  console.log(selectedUser, selectedUserName)
 
   return (
     <>
       <nav className="fixed top-6 left-0 right-0 flex-1 p-2   bg-blue-950 h-14 ml-auto max-w-[78rem] flex justify-around items-center ">
-        {/* <div className="flex  items-center "> */}
-        {/* <div
-            className="w-12 h-12  ml-16 bg-blue-500 rounded-full border cursor-pointer"
-            onClick={handleOpen}
-          ></div> */}
-        {/* <Avatar src="/broken-image.jpg" /> */}
-
+        
         <h3
           className="text-white ml-3 text-2xl font-sans font-bold cursor-pointer"
           onClick={handleOpen}
         >
-          # {groupName}
+         {selectedUserName ? selectedUserName : `# ${groupName}`}
+         
         </h3>
         <div className="w-12"></div>
         <div className="w-12"></div>

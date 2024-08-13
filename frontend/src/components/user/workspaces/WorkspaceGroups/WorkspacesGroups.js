@@ -10,6 +10,7 @@ import Diversity3Icon from "@mui/icons-material/Diversity3";
 import Button from "@mui/material/Button";
 import CreateGroupModal from "../../Group/CreateGroup";
 import { setGroupId, setGroupName } from "../../../../Redux/Groups/GroupSlice";
+import { setSelectedUser, setselectedUserName } from "../../../../Redux/SelectedUser/SelectedUser";
 
 const WorkspacesGroups = () => {
   const [groupsOpen, setGroupsOpen] = useState(false);
@@ -62,6 +63,10 @@ const WorkspacesGroups = () => {
   const handleGroupLaunch = (id, group_name) => {
     dispatch(setGroupId(id));
     dispatch(setGroupName(group_name));
+
+    dispatch(setselectedUserName(null))
+    dispatch(setSelectedUser(null))
+    
     navigate("chat");
   };
 
