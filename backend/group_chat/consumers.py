@@ -98,7 +98,6 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_existing_messages(self):
         messages = GroupChatMessages.objects.filter(group=self.group_id)
-        print("self.room_group_name", self.group_id)
         return [
             {
                 "message": message.message,
@@ -173,9 +172,7 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         else:
             print("Sender not found")
 
-
-# --------------------------------------------------for video and audio call-----------------------------------------#
-
+    # --------------------------------------------------for video and audio call-----------------------------------------#
 
     async def video_link_receive(self, username, sender):
         await self.channel_layer.group_send(
@@ -189,7 +186,6 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
             },
         )
 
-
     async def video_call_link(self, event):
         sender = event["data"]["sender"]
         username = event["data"]["username"]
@@ -199,7 +195,6 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
             )
         )
 
-
     async def audio_link_receive(self, username, sender):
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -208,7 +203,6 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
                 "data": {"username": username, "sender": sender},
             },
         )
-
 
     async def audio_call_link(self, event):
         username = event["data"]["username"]

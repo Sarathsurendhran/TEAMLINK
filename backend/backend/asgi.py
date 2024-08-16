@@ -13,7 +13,7 @@ import django
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from group_chat.routes import websocket_urlpatterns
-from group_chat.routes import websocket_urlpatterns
+from dm_chat.routes import websocket_urlpatterns as personal_chat_urlpatterns
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
@@ -22,5 +22,5 @@ application = get_asgi_application()
 
 
 application = ProtocolTypeRouter(
-    {"http": application, "websocket": URLRouter(websocket_urlpatterns)}
+    {"http": application, "websocket": URLRouter(websocket_urlpatterns + personal_chat_urlpatterns)}
 )

@@ -54,11 +54,6 @@ const ChatTextEditor = ({ connection }) => {
 
     setIsLoading(true);
 
-    // if (selectedFile.size > 2 * 1024 * 1024) { // Check for 2 MB limit
-    //   toast.error("You can only send Files less than 2 MB");
-    //   setIsLoading(false);
-    //   return; 
-    // }
 
     let formData = new FormData();
     formData.append("file", selectedFile);

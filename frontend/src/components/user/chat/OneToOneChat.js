@@ -8,15 +8,18 @@ import OneToOneChatTextEditor from "./OneToOneChatTextEditor";
 export default function OneToOneChat() {
   const baseURL = process.env.REACT_APP_baseURL;
   const webSocketURL = process.env.REACT_APP_webSocketURL;
+
   const { id, username } = useSelector((state) => state.authenticationUser);
   const [chatHistory, setChatHistory] = useState([]);
   const chatContainerRef = useRef(null);
 
-  const selectedUser = useSelector((state) => state.selectedUser);
-  const selectedUserName = useSelector((state) => state.selectedUser.selectedUserName);
+  const selectedUser = useSelector((state) => state.selectedUser.selectedUser);
+  const selectedUserName = useSelector(
+    (state) => state.selectedUser.selectedUserName
+  );
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
-    `${webSocketURL}one-to-one-chat/${id}/`,
+    `${webSocketURL}ws/dm-chat/${id}/${selectedUser}/`, 
     {
       onOpen: () => console.log("Websocket connection is opened"),
       onClose: () => {
@@ -29,9 +32,15 @@ export default function OneToOneChat() {
 
   useEffect(() => {
     if (lastMessage?.data) {
-      setChatHistory((prev) => [JSON.parse(lastMessage.data)].concat(prev));
+      setChatHistory((prev) => prev.concat(JSON.parse(lastMessage.data)));
     }
   }, [lastMessage]);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatHistory]);
 
   return (
     <>
@@ -101,7 +110,7 @@ export default function OneToOneChat() {
         </div>
       </div>
       <OneToOneChatTextEditor
-        connection={sendMessage}
+        sendMessage={sendMessage}
         readyState={readyState}
       />
     </>
