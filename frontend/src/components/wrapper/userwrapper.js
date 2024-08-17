@@ -16,7 +16,7 @@ import ThreeDBackground from "../vantajs/ThreeDBackground";
 import UserCheckingWrapper from "./userchecking_wrapper";
 import WorkspaceIsblocked from "./checking_workspace_isblocked";
 import { useRoutes } from "react-router-dom";
-import Chat from "../user/chat/GroupChat";
+import Chat from "../user/Group/GroupChat/GroupChat";
 import OneToOneChat from "../user/chat/OneToOneChat";
 
 import GroupVideoCall from "../user/Group/GroupCall/GroupVideoCall";

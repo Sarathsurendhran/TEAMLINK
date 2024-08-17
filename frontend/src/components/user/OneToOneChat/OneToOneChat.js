@@ -19,7 +19,7 @@ export default function OneToOneChat() {
   );
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
-    `${webSocketURL}ws/dm-chat/${id}/${selectedUser}/`, 
+    `${webSocketURL}ws/dm-chat/${id}/${selectedUser}/`,
     {
       onOpen: () => console.log("Websocket connection is opened"),
       onClose: () => {
@@ -38,7 +38,8 @@ export default function OneToOneChat() {
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [chatHistory]);
 

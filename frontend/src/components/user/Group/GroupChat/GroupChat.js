@@ -2,17 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import ChatTextEditor from "./ChatTextEditor";
 import { useSelector, useDispatch } from "react-redux";
 import { w3cwebsocket } from "websocket";
-import { setGroupId, setGroupName } from "../../../Redux/Groups/GroupSlice";
+import { setGroupId, setGroupName } from "../../../../Redux/Groups/GroupSlice";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import VideoCallAlert from "../Group/GroupCall/GroupVideoCallAlert";
-import AudioCallAlert from "../Group/GroupCall/GroupAudioCallAlert";
+import VideoCallAlert from "../GroupCall/GroupVideoCall";
+import AudioCallAlert from "../GroupCall/GroupAudioCallAlert";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
-import useSound from 'use-sound';
-
+import useSound from "use-sound";
 
 const Chat = () => {
   const baseURL = process.env.REACT_APP_baseURL;
@@ -33,7 +32,6 @@ const Chat = () => {
   const { startVideoCall } = location.state || {};
 
   const { startAudioCall } = location.state || {};
-
 
   //.............. fetechig the general group...........
 
@@ -175,8 +173,6 @@ const Chat = () => {
   if (startAudioCall) {
     audioCall();
   }
-
-
 
   return (
     <>

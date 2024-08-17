@@ -12,9 +12,9 @@ import Box from "@mui/material/Box";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import EditGroup from "../Group/EditGroup";
-import GroupMembers from "../Group/GroupMembers";
-import AddMembers from "../Group/AddMembers";
+import EditGroup from "../EditGroup";
+import GroupMembers from "../GroupMembers";
+import AddMembers from "../AddMembers";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

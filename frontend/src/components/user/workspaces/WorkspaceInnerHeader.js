@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ProfileModal from "../chat/ProfileModal";
+import ProfileModal from "../Group/GroupChat/ProfileModal"
 import { useSelector, useDispatch } from "react-redux";
 import Avatar from "@mui/material/Avatar";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";

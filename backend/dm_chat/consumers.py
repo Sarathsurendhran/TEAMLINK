@@ -20,8 +20,13 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         for message in existing_messages:
             await self.send(text_data=json.dumps(message))
 
+
+
+
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.room_name, self.channel_name)
+
+
 
     async def receive(self, text_data=None):
         data = json.loads(text_data)
@@ -40,8 +45,12 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
 
         await self.broadcast_message(message, sender, time, message_type)
 
+
+
     async def chat_message(self, event):
         await self.send(text_data=json.dumps(event["data"]))
+
+
 
     async def send_call_link(self, link, sender, message_type):
         await self.channel_layer.group_send(
@@ -57,6 +66,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             },
         )
 
+
     async def broadcast_message(self, message, sender, time, message_type):
         await self.channel_layer.group_send(
             self.room_name,
@@ -70,6 +80,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
                 },
             },
         )
+
 
     @database_sync_to_async
     def get_existing_messages(self):
@@ -86,10 +97,12 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             for message in messages
         ]
 
+
     async def save_message(self, sender, message, message_type):
         sender_instance = await self.get_member_instance(sender)
         if sender_instance:
             await self.save_message_to_db(sender_instance, message, message_type)
+
 
     @database_sync_to_async
     def get_member_instance(self, member_id):
@@ -99,6 +112,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         except User.DoesNotExist:
             print("Member not found.")
         return None
+
 
     @database_sync_to_async
     def save_message_to_db(self, sender, message, message_type):
