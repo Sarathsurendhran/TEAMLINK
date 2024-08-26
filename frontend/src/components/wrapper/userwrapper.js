@@ -17,10 +17,13 @@ import UserCheckingWrapper from "./userchecking_wrapper";
 import WorkspaceIsblocked from "./checking_workspace_isblocked";
 import { useRoutes } from "react-router-dom";
 import Chat from "../user/Group/GroupChat/GroupChat";
-import OneToOneChat from "../user/chat/OneToOneChat";
+import OneToOneChat from "../user/OneToOneChat/OneToOneChat";
 
 import GroupVideoCall from "../user/Group/GroupCall/GroupVideoCall";
 import GroupAudioCall from "../user/Group/GroupCall/GroupAudioCall";
+
+import OneToOneVideoCall from "../user/OneToOneChat/OneToOneCall/OneToOneVideoCall";
+import OneToOneAudioCall from "../user/OneToOneChat/OneToOneCall/OneToOneAudioCall";
 
 const UserWrapper = () => {
   const authentication_user = useSelector((state) => state.authentication_user);
@@ -121,6 +124,22 @@ const UserWrapper = () => {
         </PrivateRoutes>
       ),
     },
+    {
+      path: "/one-to-one-video/:roomId",
+      element:(
+        <PrivateRoutes>
+          <OneToOneVideoCall/>
+        </PrivateRoutes>
+      )
+    },
+    {
+      path: "/one-to-one-audio/:roomId",
+      element:(
+        <PrivateRoutes>
+          <OneToOneAudioCall/>
+        </PrivateRoutes>
+      )
+    }
   ]);
 
   return routes;

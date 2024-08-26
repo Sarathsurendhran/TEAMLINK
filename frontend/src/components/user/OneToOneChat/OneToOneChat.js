@@ -4,10 +4,15 @@ import useWebSocket from "react-use-websocket";
 import { ReadyState } from "react-use-websocket";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import OneToOneChatTextEditor from "./OneToOneChatTextEditor";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import OneToOneVideoCallAlert from "./OneToOneCall/OneToOneVideoCallAlert";
+import OneToOneAudioCallAlert from "./OneToOneCall/OneToOneAudioCallAlert";
 
 export default function OneToOneChat() {
   const baseURL = process.env.REACT_APP_baseURL;
   const webSocketURL = process.env.REACT_APP_webSocketURL;
+  const navigate = useNavigate();
 
   const { id, username } = useSelector((state) => state.authenticationUser);
   const [chatHistory, setChatHistory] = useState([]);
@@ -17,6 +22,20 @@ export default function OneToOneChat() {
   const selectedUserName = useSelector(
     (state) => state.selectedUser.selectedUserName
   );
+
+  // Compute roomId
+  const roomId = `chat_${Math.min(id, selectedUser)}-${Math.max(
+    id,
+    selectedUser
+  )}`;
+
+  const [videoCallAlert, setVideoCallAlert] = useState(false);
+  const [audioCallAlert, setAudioCallAlert] = useState(false);
+
+  const location = useLocation();
+  const { startVideoCall } = location.state || {};
+
+  const { startAudioCall } = location.state || {};
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     `${webSocketURL}ws/dm-chat/${id}/${selectedUser}/`,
@@ -32,7 +51,28 @@ export default function OneToOneChat() {
 
   useEffect(() => {
     if (lastMessage?.data) {
-      setChatHistory((prev) => prev.concat(JSON.parse(lastMessage.data)));
+      const messageData = JSON.parse(lastMessage.data);
+
+      if (messageData.type === "video_call") {
+        if (messageData.sender === id) {
+          // Navigate to the video call route if the current user initiated the call
+          navigate(`/one-to-one-video/${roomId}/`);
+        } else {
+          // Show video call alert if the call was initiated by someone else
+          setVideoCallAlert(true);
+        }
+      } else if (messageData.type === "audio_call") {
+        if (messageData.sender === id) {
+          // Navigate to the audio call route if the current user initiated the call
+          navigate(`/one-to-one-audio/${roomId}/`);
+        } else {
+          // Show audio call alert if the call was initiated by someone else
+          setAudioCallAlert(true);
+        }
+      } else {
+        // Handle other message types
+        setChatHistory((prev) => prev.concat(messageData));
+      }
     }
   }, [lastMessage]);
 
@@ -42,6 +82,44 @@ export default function OneToOneChat() {
         chatContainerRef.current.scrollHeight;
     }
   }, [chatHistory]);
+
+  //------------------------------------call--------------------------------
+  const videoCall = () => {
+    const message = {
+      message: "started video call",
+      type: "video_call",
+      sender: id,
+      username: username,
+    };
+
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(JSON.stringify(message));
+    } else {  
+      console.log("Websocket is not open");
+    }
+  };
+
+  if (startVideoCall) {
+    videoCall();
+  }
+
+  const audioCall = () => {
+    const message = {
+      message: "started audio call",
+      type: "audio_call",
+      sender: id,
+      username: username,
+    };
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(JSON.stringify(message));
+    } else {
+      console.log("Websocket is not open");
+    }
+  };
+
+  if (startAudioCall) {
+    audioCall();
+  }
 
   return (
     <>
@@ -109,6 +187,19 @@ export default function OneToOneChat() {
             ))}
           </div>
         </div>
+
+        {videoCallAlert && (
+          <OneToOneVideoCallAlert
+            setVideoCallAlert={setVideoCallAlert}
+            roomId={roomId}
+          />
+        )}
+        {audioCallAlert && (
+          <OneToOneAudioCallAlert
+            setAudioCallAlert={setAudioCallAlert}
+            roomId={roomId}
+          />
+        )}
       </div>
       <OneToOneChatTextEditor
         sendMessage={sendMessage}

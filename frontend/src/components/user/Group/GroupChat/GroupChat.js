@@ -6,7 +6,7 @@ import { setGroupId, setGroupName } from "../../../../Redux/Groups/GroupSlice";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import VideoCallAlert from "../GroupCall/GroupVideoCall";
+import VideoCallAlert from "../GroupCall/GroupVideoCallAlert";
 import AudioCallAlert from "../GroupCall/GroupAudioCallAlert";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
@@ -89,22 +89,22 @@ const Chat = () => {
 
         // console.log("Received data:", data);
 
-        if (data.type === "video_call") {
-          if (data.sender === id) {
-            navigate(`/group-video/${groupId}/`);
+          if (data.type === "video_call") {
+            if (data.sender === id) {
+              navigate(`/group-video/${groupId}/`);
+            } else {
+              setVideoCallAlert(true);
+            }
+          } else if (data.type === "audio_call") {
+            if (data.sender === id) {
+              navigate(`/audio-call/${groupId}/`);
+            } else {
+              setAudioCallAlert(true);
+            }
           } else {
-            setVideoCallAlert(true);
+            setChatMessages((prevMessages) => [...prevMessages, data]);
+            scrollToBottom();
           }
-        } else if (data.type === "audio_call") {
-          if (data.sender === id) {
-            navigate(`/audio-call/${groupId}/`);
-          } else {
-            setAudioCallAlert(true);
-          }
-        } else {
-          setChatMessages((prevMessages) => [...prevMessages, data]);
-          scrollToBottom();
-        }
       } catch (error) {
         console.error("Error parsing message data:", error);
       }
@@ -144,7 +144,7 @@ const Chat = () => {
       sender: id,
       username: username,
     };
-
+    
     if (connection && connection.readyState === connection.OPEN) {
       connection.send(JSON.stringify(message));
     } else {
@@ -173,6 +173,7 @@ const Chat = () => {
   if (startAudioCall) {
     audioCall();
   }
+
 
   return (
     <>
