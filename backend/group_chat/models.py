@@ -36,3 +36,7 @@ class GroupChatMessages(models.Model):
 
     def __str__(self):
         return f"{self.sender}:{self.message}"
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
