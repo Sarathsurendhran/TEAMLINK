@@ -40,3 +40,4 @@ class GroupChatMessages(models.Model):
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(WorkspaceGroups, on_delete=models.CASCADE)
