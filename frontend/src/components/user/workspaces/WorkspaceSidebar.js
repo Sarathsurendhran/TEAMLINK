@@ -6,6 +6,9 @@ import WorkSpaceUserList from "./WorkSpaceUserList/WorkSpaceUserList";
 import WorkspacesGroups from "./WorkspaceGroups/WorkspacesGroups";
 import WorkspaceAddUsers from "./WorkspaceAddUsers/WorkspaceAddUsers";
 import WorkspaceSettingsModal from "./WorkspaceSettings/WorkspaceSettingsModal";
+import GroupNotifications from "../Group/GroupNotifications/GroupNotifications";
+
+
 import Avatar from "@mui/material/Avatar";
 import { useSelector } from "react-redux";
 
@@ -150,6 +153,8 @@ const WorkspaceSidebar = () => {
                 <WorkSpaceUserList />
 
                 <WorkspaceAddUsers />
+
+                <GroupNotifications/>
 
                 <li>
                   <button

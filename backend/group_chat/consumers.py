@@ -1,10 +1,14 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import async_to_sync, sync_to_async
 import json
+import asyncio
 from django.utils import timezone
 from channels.db import database_sync_to_async
-from .models import GroupChatMessages
+from .models import GroupChatMessages, GroupMembers, Notification
 from workspaces.models import WorkSpaceMembers, WorkSpaces
 from users.models import User
+from django.db.models import F
+from channels.layers import get_channel_layer
 
 
 class GroupChatConsumer(AsyncWebsocketConsumer):
@@ -51,6 +55,9 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
                 },
             },
         )
+
+        # Notify group members except the sender
+        await self.notify_group_members(sender, message)
 
     async def chat_message(self, event):
         message = event["data"]["message"]
@@ -168,6 +175,7 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
                 message=message,
                 group=self.group_id,
             )
+
             print("Message saved to the database")
         else:
             print("Sender not found")
@@ -212,3 +220,99 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
                 {"type": "audio_call", "username": username, "sender": sender}
             )
         )
+
+    async def notify_group_members(self, sender, message):
+        """
+        Notify all group members except the sender about the new message.
+        """
+        channel_layer = get_channel_layer()
+        unread_message_count = await self.get_unread_messages()
+
+        data = {
+            "count": unread_message_count,
+            "message": message,
+            "group_id": self.group_id,
+            "sender": sender,
+        }
+        await channel_layer.group_send(
+            f"notification_{self.group_id}",
+            {
+                "type": "send_notification",
+                "value": json.dumps(data),
+            },
+        )
+
+    @database_sync_to_async
+    def get_unread_messages(self):
+        return GroupChatMessages.objects.filter(group=self.group_id, read=False).count()
+
+
+class NotificationConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user_id = self.scope["url_route"]["kwargs"]["user_id"]
+        self.workspace_id = self.scope["url_route"]["kwargs"]["workspace_id"]
+        self.groups = await self.get_user_groups(self.user_id, self.workspace_id)
+
+        for group in self.groups:
+            room_group_name = f"notification_{group}"
+            await self.channel_layer.group_add(room_group_name, self.channel_name)
+
+        await self.accept()
+
+        # Sending unread messages from the database
+        notifications = await self.get_unread_notifications()
+        for notification in notifications:
+            await self.send(
+                text_data=json.dumps(
+                    {
+                        "message": notification["message"],
+                        "time_stamp": notification["time_stamp"].strftime(
+                            "%Y-%m-%dT%H:%M:%S.%fZ"
+                        ),
+                        "read": notification["read"],
+                    }
+                )
+            )
+
+    @database_sync_to_async
+    def get_user_groups(self, user_id, workspace_id):
+        # Assuming GroupMembers has a foreign key to WorkSpaceMembers
+        return list(
+            GroupMembers.objects.filter(
+                member__user_id=user_id, member__workspace_id=workspace_id
+            ).values_list("group_id", flat=True)
+        )
+
+    @database_sync_to_async
+    def get_unread_notifications(self):
+        # Retrieve unread notifications for all groups the user is part of, excluding the sender's own messages
+        return list(
+            GroupChatMessages.objects.filter(group__in=self.groups, read=False)
+            .exclude(sender=self.user_id)
+            .values("message", "time_stamp", "read")
+            .order_by("time_stamp")
+        )
+
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
+    async def send_notification(self, event):
+        # Parse the JSON string in the `value` field
+        data = json.loads(event["value"])
+
+        # Access individual fields from the parsed data
+        count = data.get("count")
+        message = data.get("message")
+        group_id = data.get("group_id")
+        sender = data.get("sender")
+
+        # Only send if this connection is not the sender
+        if self.user_id != sender:
+            await self.send(
+                text_data=json.dumps(
+                    {
+                        "message": message,
+                        "count": count,
+                    }
+                )
+            )

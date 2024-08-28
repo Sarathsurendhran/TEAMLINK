@@ -33,11 +33,19 @@ class GroupChatMessages(models.Model):
     time_stamp = models.DateTimeField(default=timezone.now)
     group = models.CharField(max_length=100, null=True)
     type = models.CharField(default='text_message')
+    read = models.BooleanField(default=False, null=True)
 
     def __str__(self):
         return f"{self.sender}:{self.message}"
 
 
+    
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(WorkspaceGroups, on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, related_name='sent_notifications', on_delete=models.CASCADE, null=True)
+    recipient = models.ForeignKey(User, related_name='received_notifications', on_delete=models.CASCADE, null=True)
+    message = models.TextField(null=True)
+    read = models.BooleanField(default=False, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        ordering = ['-timestamp']
