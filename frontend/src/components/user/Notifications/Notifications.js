@@ -71,11 +71,13 @@ export default function Notifications() {
             (prevCount) => prevCount + notification.unread_count
           );
         }
-      } 
+      }
 
       setNotifications((prev) => [{ ...notification, type: "group" }, ...prev]);
     }
+
   }, [lastGroupMessage]);
+
 
   useEffect(() => {
     // Handle personal chat notifications
@@ -101,6 +103,9 @@ export default function Notifications() {
     }
   }, [lastPersonalMessage]);
 
+
+
+
   // Reset state when workspaceID changes
   useEffect(() => {
     setNotifications([]);
@@ -115,6 +120,8 @@ export default function Notifications() {
       ""
     );
   };
+
+
 
   return (
     <React.Fragment>
@@ -178,7 +185,6 @@ export default function Notifications() {
                   className="bg-gray-800 mb-2 cursor-pointer shadow-md hover:bg-gray-700 p-4"
                 >
                   <div>
-                    {/* Handle notification types differently */}
                     {notification.type === "group" ? (
                       <>
                         <h4 className="text-white text-xl mb-2 font-bold">
@@ -199,9 +205,6 @@ export default function Notifications() {
                       </>
                     ) : (
                       <>
-                        <h4 className="text-white text-xl mb-2 font-bold">
-                          {/* {notification.sender_name} */}
-                        </h4>
                         <div className="flex flex-col">
                           {notification.message && (
                             <h4 className="text-white text-base mb-1">

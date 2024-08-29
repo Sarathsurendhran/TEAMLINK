@@ -22,7 +22,7 @@ class ReadStatusUpdate(APIView):
                 is_read=True
             )
 
-            self.trigger_unread_notification(room_name)
+            self.trigger_unread_notification(authenticated_user)
 
             return Response(
                 {"message": "Read status updated successfully"},
@@ -38,6 +38,7 @@ class ReadStatusUpdate(APIView):
         channel_layer = get_channel_layer()
         group_name = f"notification_{room_id}"
 
+   
         # Send the notification to the channel layer group
         async_to_sync(channel_layer.group_send)(
             group_name,
