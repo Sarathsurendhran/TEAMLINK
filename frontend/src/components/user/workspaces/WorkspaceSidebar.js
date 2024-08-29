@@ -6,7 +6,7 @@ import WorkSpaceUserList from "./WorkSpaceUserList/WorkSpaceUserList";
 import WorkspacesGroups from "./WorkspaceGroups/WorkspacesGroups";
 import WorkspaceAddUsers from "./WorkspaceAddUsers/WorkspaceAddUsers";
 import WorkspaceSettingsModal from "./WorkspaceSettings/WorkspaceSettingsModal";
-import GroupNotifications from "../Group/GroupNotifications/GroupNotifications";
+import Notifications from "../Notifications/Notifications";
 
 
 import Avatar from "@mui/material/Avatar";
@@ -154,7 +154,7 @@ const WorkspaceSidebar = () => {
 
                 <WorkspaceAddUsers />
 
-                <GroupNotifications/>
+                <Notifications/>
 
                 <li>
                   <button

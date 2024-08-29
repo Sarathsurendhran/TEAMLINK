@@ -11,5 +11,7 @@ urlpatterns = [
     path("remove-group-member/", views.RemoveGroupMember.as_view(), name="remove-group-member" ),
     path("add-member/", views.AddMembers.as_view(), name='add-member'),
 
-    path("group-detail/<int:workspace_id>/", views.GroupDetail.as_view())
+    path("group-detail/<int:workspace_id>/", views.GroupDetail.as_view()),
+
+    path("read-status-update/<int:group_id>/", views.ReadStatusUpdate.as_view())
 ]

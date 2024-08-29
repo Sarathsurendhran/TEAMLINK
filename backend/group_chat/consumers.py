@@ -227,15 +227,21 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         Notify all group members except the sender about the new message.
         """
         channel_layer = get_channel_layer()
-        unread_message_count = await self.get_unread_messages()
+
+        group_name = await self.get_group_name(self.group_id)
+
+        sender_name = await self.get_sender_name(sender)
 
         data = {
-            "count": unread_message_count,
+            "count": 1,
             "message": message,
             "group_id": self.group_id,
             "sender": sender,
             "time": time,
+            "group_name": group_name,
+            "sender_name": sender_name,
         }
+
         await channel_layer.group_send(
             f"notification_{self.group_id}",
             {
@@ -245,8 +251,14 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         )
 
     @database_sync_to_async
-    def get_unread_messages(self):
-        return GroupChatMessages.objects.filter(group=self.group_id, read=False).count()
+    def get_group_name(self, group_id):
+        group = WorkspaceGroups.objects.get(id=group_id)
+        return group.group_name
+
+    @database_sync_to_async
+    def get_sender_name(self, sender):
+        sender = User.objects.get(id=sender)
+        return sender.username
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
@@ -282,6 +294,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                         "read": notification["read"],
                         "group_name": notification["group_name"],
                         "sender_name": notification["sender_name"],
+                        #  "type": notification["type"],
                     }
                 )
             )
@@ -293,6 +306,18 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             GroupMembers.objects.filter(
                 member__user_id=user_id, member__workspace_id=workspace_id
             ).values_list("group_id", flat=True)
+        )
+
+    async def trigger_unread_notifications(self, event):
+        # Retrieve unread notifications and count
+        unread_count, notifications = await self.get_unread_notifications()
+        # Send the unread count first
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "unread_count": unread_count,
+                }
+            )
         )
 
     @database_sync_to_async
@@ -307,25 +332,23 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
         # Get the list of unread notifications
         unread_messages = list(
-            unread_notifications.values("message", "time_stamp", "read", "group", "sender__username").order_by(
-                "time_stamp"
-            )
+            unread_notifications.values(
+                "message", "time_stamp", "read", "group", "sender__username"
+            ).order_by("time_stamp")
         )
 
-         # Fetch group names and add them to the notifications
+        # Fetch group names and add them to the notifications
         for message in unread_messages:
-            group = WorkspaceGroups.objects.get(id=message['group']) 
-            message['group_name'] = group.group_name
-            message['sender_name'] = message['sender__username'] 
+            group = WorkspaceGroups.objects.get(id=message["group"])
+            message["group_name"] = group.group_name
+            message["sender_name"] = message["sender__username"]
+            # message['type'] = 'group'
 
         return unread_count, unread_messages
-    
-
 
     async def disconnect(self):
         room_group_name = f"notification_{self.room_group_name}"
         await self.channel_layer.group_discard(room_group_name, self.channel_name)
-
 
     async def send_notification(self, event):
         # Parse the JSON string in the `value` field
@@ -337,11 +360,19 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         group_id = data.get("group_id")
         sender = data.get("sender")
         time = data.get("time")
+        sender_name = data.get("sender_name")
+        group_name = data.get("group_name")
 
         # Only send if this connection is not the sender
         if self.user_id != sender:
             await self.send(
                 text_data=json.dumps(
-                    {"message": message, "unread_count": count, "time": time}
+                    {
+                        "message": message,
+                        "unread_count": count,
+                        "time": time,
+                        "sender_name": sender_name,
+                        "group_name": group_name,
+                    }
                 )
             )

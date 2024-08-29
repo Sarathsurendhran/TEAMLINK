@@ -4,6 +4,7 @@ from users.models import User
 from django.utils import timezone
 
 
+
 class WorkspaceGroups(models.Model):
     group_name = models.CharField(max_length=100, null=True)
     description = models.CharField(max_length=200, null=True)
@@ -49,3 +50,7 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
+
+
+
+

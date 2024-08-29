@@ -10,6 +10,7 @@ class OneToOneChatMessages(models.Model):
     time_stamp = models.DateTimeField(default=timezone.now)
     type = models.CharField(default="text_message")
     room = models.CharField(max_length=100)
+    is_read = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.sender}:{self.message}"

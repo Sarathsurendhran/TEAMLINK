@@ -14,6 +14,10 @@ from .serializers import (
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
+
 
 class CreateGroupView(APIView):
     permission_classes = [IsAuthenticated]
@@ -295,3 +299,38 @@ class GroupDetail(APIView):
         except WorkspaceGroups.DoesNotExist:
             print("workspace not found")
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReadStatusUpdate(APIView):
+    def post(self, request, group_id):
+        try:
+            # Fetch all messages in the group
+            group_messages = GroupChatMessages.objects.filter(group=group_id)
+
+            # Update the read status for all messages
+            group_messages.update(read=True)
+
+            self.trigger_unread_notification(group_id)
+
+            return Response(
+                {"message": "Read status updated successfully"},
+                status=status.HTTP_200_OK,
+            )
+
+        except WorkspaceGroups.DoesNotExist:
+            return Response(
+                {"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+
+    def trigger_unread_notification(self, group_id):
+        channel_layer = get_channel_layer()
+        group_name = f"notification_{group_id}"
+
+        # Send the notification to the channel layer group
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                "type": "trigger_unread_notifications",  
+            },
+        )

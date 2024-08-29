@@ -71,12 +71,28 @@ const WorkSpaceUserList = () => {
     } catch (error) {
       console.error("Error launching workspace:", error);
     }
-  };  
+  }; 
+
+
+  const updateReadStatus = async (selectedUserId, authenticated_user_id) => {
+    try {
+      const response = await axios.post(`${baseURL}dm-chat/read-status-update/${selectedUserId}/${authenticated_user_id}/`);
+      if (response.status === 200) {
+        console.log("Group reading status updated");
+      }
+    } catch (error) {
+      console.error("Error updating group reading status:", error);
+    }
+  };
+
 
   
   const handleSelectedUser = (user_id, username) => {
     dispatch(setSelectedUser(user_id))
     dispatch(setselectedUserName(username))
+
+    updateReadStatus(user_id, authenticated_user_id)
+
     navigate('one-to-one-chat')
   }
 

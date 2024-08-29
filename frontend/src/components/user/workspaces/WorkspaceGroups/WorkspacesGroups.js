@@ -12,6 +12,7 @@ import CreateGroupModal from "../../Group/CreateGroup";
 import { setGroupId, setGroupName } from "../../../../Redux/Groups/GroupSlice";
 import { setSelectedUser, setselectedUserName } from "../../../../Redux/SelectedUser/SelectedUser";
 
+
 const WorkspacesGroups = () => {
   const [groupsOpen, setGroupsOpen] = useState(false);
 
@@ -60,15 +61,31 @@ const WorkspacesGroups = () => {
     }
   };
 
+
+  const updateReadStatus = async (id) => {
+    try {
+      const response = await axios.post(`${baseURL}group/read-status-update/${id}/`);
+      if (response.status === 200) {
+        console.log("Group reading status updated");
+      }
+    } catch (error) {
+      console.error("Error updating group reading status:", error);
+    }
+  };
+
   const handleGroupLaunch = (id, group_name) => {
     dispatch(setGroupId(id));
     dispatch(setGroupName(group_name));
 
     dispatch(setselectedUserName(null))
     dispatch(setSelectedUser(null))
+
+    // Trigger the read status update when the group is launched
+    updateReadStatus(id);
     
     navigate("chat");
   };
+
 
   return (
     <div>
