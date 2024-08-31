@@ -359,7 +359,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         message = data.get("message")
         group_id = data.get("group_id")
         sender = data.get("sender")
-        time = data.get("time")
+        time = data.get("time").isoformat()
         sender_name = data.get("sender_name")
         group_name = data.get("group_name")
 

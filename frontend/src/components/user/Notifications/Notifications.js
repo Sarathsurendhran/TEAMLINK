@@ -19,7 +19,6 @@ export default function Notifications() {
   const [unreadCountForGroup, setUnreadCountForGroup] = useState(0);
   const [unreadCountForPersonal, setUnreadCountForPersonal] = useState(0);
 
-  const [wsKey, setWsKey] = useState(0); // Add a key to force reconnect
 
   const handleClickOpen = (scrollType) => () => {
     setOpen(true);
@@ -59,7 +58,7 @@ export default function Notifications() {
   useEffect(() => {
     // Handle group notifications
     if (lastGroupMessage?.data) {
-      const notification = JSON.parse(lastGroupMessage.data);
+      const notification = lastGroupMessage?.data ? JSON.parse(lastGroupMessage.data) : null;
 
       if (notification.unread_count !== undefined) {
         if (notification.unread_count === 0) {
@@ -111,7 +110,6 @@ export default function Notifications() {
     setNotifications([]);
     setUnreadCountForGroup(0);
     setUnreadCountForPersonal(0);
-    setWsKey((prevKey) => prevKey + 1);
   }, [workspaceID]);
 
   const formatTime = (time) => {
@@ -179,9 +177,10 @@ export default function Notifications() {
             className="text-white"
           >
             <List>
-              {notifications.map((notification) => (
+           
+              {notifications.map((notification, index) => (
                 <ListItem
-                  key={notification.id}
+                  key={index}
                   className="bg-gray-800 mb-2 cursor-pointer shadow-md hover:bg-gray-700 p-4"
                 >
                   <div>
@@ -222,6 +221,7 @@ export default function Notifications() {
                   </div>
                 </ListItem>
               ))}
+            
             </List>
           </DialogContentText>
         </DialogContent>

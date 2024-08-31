@@ -21,4 +21,5 @@ urlpatterns = [
   path('change-user-name/', views.ChangeUserName.as_view(), name='change-user-name'),
   path('change-about-user/', views.ChangeAboutUser.as_view(), name='change-about-user'),
   path('change-profile-pic/', views.ChangeProfilePic.as_view(), name='change-profile-pic'),
+
 ]

@@ -42,14 +42,14 @@ const WorkspaceInnerHeader = () => {
     navigate(path, { state: { startAudioCall: true } });
   };
 
-  console.log(selectedUser, selectedUserName);
+ 
 
   return (
     <>
       <nav className="fixed top-6 left-0 right-0 flex-1 p-2   bg-blue-950 h-14 ml-auto max-w-[78rem] flex justify-around items-center ">
         <h3
           className="text-white ml-3 text-2xl font-sans font-bold cursor-pointer"
-          onClick={handleOpen}
+          onClick={selectedUserName ? undefined : handleOpen}
         >
           {selectedUserName ? selectedUserName : `# ${groupName}`}
         </h3>
@@ -62,15 +62,14 @@ const WorkspaceInnerHeader = () => {
           <button title="Video Call" onClick={handleVideoCall}>
             <Video size={30} />
           </button>
-          {/* style={{  marginTop: "20px",  }} */}
+         
           <button title="Voice Call" onClick={handleAudioCall}>
             <Phone size={22} style={{ marginLeft: "20px" }} />
           </button>
         </div>
 
-        {/* </div> */}
       </nav>
-      <ProfileModal open={modalOpen} handleClose={handleClose} />
+      {!selectedUserName && <ProfileModal open={modalOpen} handleClose={handleClose} />}
     </>
   );
 };

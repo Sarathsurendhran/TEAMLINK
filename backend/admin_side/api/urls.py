@@ -9,5 +9,12 @@ urlpatterns = [
         name="user-status-update/",
     ),
     path("workspace-list/", views.WorkspaceList.as_view(), name="workspace-list/"),
-    path("change-workspace-status/<int:workspace_id>/", views.WorkspaceStatusUpdate.as_view(), name="change-workspace-status/"),
+    path(
+        "change-workspace-status/<int:workspace_id>/",
+        views.WorkspaceStatusUpdate.as_view(),
+        name="change-workspace-status/",
+    ),
+    path("total-user/", views.TotalUserCount.as_view()),
+    path("total-workspaces/", views.TotalWorkSpaceCount.as_view()),
+    # path("total-user/", views.TotalUserCount.as_view()),
 ]

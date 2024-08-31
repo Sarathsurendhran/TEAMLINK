@@ -152,8 +152,8 @@ ASGI_APPLICATION = "backend.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        # "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
-        "CONFIG": {"hosts": [("redis", 6379)]},
+        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+        # "CONFIG": {"hosts": [("redis", 6379)]},
     }
 }
 
@@ -167,8 +167,8 @@ DATABASES = {
         "NAME": "TeamLink",
         "USER": "postgres",
         "PASSWORD": "admin@123",
-        # "HOST": "localhost",
-        "HOST":"host.docker.internal",
+        "HOST": "localhost",
+        # "HOST":"host.docker.internal",
         "PORT": "5433",
     }
 }
@@ -232,8 +232,8 @@ EMAIL_HOST_PASSWORD = "dohv iyad treq gdqu"
 
 
 # CELERY SETTINGS
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Kolkata'
+broker_url = 'redis://redis:6379/0'
+accept_content = ['json']  
+result_serializer = 'json'
+task_serializer = 'json'
+timezone = 'Asia/Kolkata'

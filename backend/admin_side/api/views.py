@@ -109,3 +109,15 @@ class WorkspaceStatusUpdate(APIView):
         except Exception as e:
             print(e)
             return Response({"message": "Something Went Wrong!"})
+
+
+class TotalUserCount(APIView):
+    def get(self, request):
+        total_user = User.objects.count()
+        return Response(total_user, status=status.HTTP_200_OK)
+    
+
+class TotalWorkSpaceCount(APIView):
+    def get(self, request):
+        total_workspaces = WorkSpaces.objects.count()
+        return Response(total_workspaces, status=status.HTTP_200_OK)

@@ -2,7 +2,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from users.send_otp import send_otp
+from users.task import send_otp
 from rest_framework import status
 from users.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
@@ -43,7 +43,8 @@ class RegisterView(APIView):
 
                 email = serializer.data["email"]
 
-                send_otp(request, email)
+                send_otp.delay(email)
+
                 content = {
                     "message": "User registration successful. Check email for OTP."
                 }
@@ -405,3 +406,7 @@ class ChangeProfilePic(APIView):
             return Response(
                 {"message": "Something Went Wrong"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+
+
+

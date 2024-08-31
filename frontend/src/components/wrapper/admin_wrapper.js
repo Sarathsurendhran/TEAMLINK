@@ -1,7 +1,7 @@
 import React from "react";
 import { useRoutes } from "react-router-dom";
 import AdminLayout from "../admin/admin_layout";
-import AdminDashboard from "../admin/admin_dashboard";
+import AdminDashboard from "../admin/AdminDashBoard";
 import AdminUserList from "../admin/admin_userlist";
 import WorkspaceList from "../admin/workspace_list";
 import AdminPrivateRoutes from "../private_routes/AdminPrivateRoutes";
