@@ -89,22 +89,22 @@ const Chat = () => {
 
         // console.log("Received data:", data);
 
-          if (data.type === "video_call") {
-            if (data.sender === id) {
-              navigate(`/group-video/${groupId}/`);
-            } else {
-              setVideoCallAlert(true);
-            }
-          } else if (data.type === "audio_call") {
-            if (data.sender === id) {
-              navigate(`/audio-call/${groupId}/`);
-            } else {
-              setAudioCallAlert(true);
-            }
+        if (data.type === "video_call") {
+          if (data.sender === id) {
+            navigate(`/group-video/${groupId}/`);
           } else {
-            setChatMessages((prevMessages) => [...prevMessages, data]);
-            scrollToBottom();
+            setVideoCallAlert(true);
           }
+        } else if (data.type === "audio_call") {
+          if (data.sender === id) {
+            navigate(`/audio-call/${groupId}/`);
+          } else {
+            setAudioCallAlert(true);
+          }
+        } else {
+          setChatMessages((prevMessages) => [...prevMessages, data]);
+          scrollToBottom();
+        }
       } catch (error) {
         console.error("Error parsing message data:", error);
       }
@@ -144,7 +144,7 @@ const Chat = () => {
       sender: id,
       username: username,
     };
-    
+
     if (connection && connection.readyState === connection.OPEN) {
       connection.send(JSON.stringify(message));
     } else {
@@ -183,9 +183,9 @@ const Chat = () => {
       >
         <div>
           <div className="flex-1 px-4 py-2 mt-24 mb-28 max-h-full ">
-            {chatMessages.length === 0 && (
+            {/* {chatMessages.length === 0 && (
               <div className="text-white">No messages yet...</div>
-            )}
+            )} */}
             {chatMessages.map((msg, index) => (
               <div
                 key={index}
@@ -238,7 +238,13 @@ const Chat = () => {
                         </a>
                       </div>
                     ) : (
-                      msg.message
+                      <div className="">
+                        <div className="mr-10 text-start ">{msg.message}</div>
+                        <div className="text-slate-400 text-xs min-w-8 text-end">
+                          {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

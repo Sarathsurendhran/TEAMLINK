@@ -5,8 +5,7 @@ import { useSelector } from "react-redux";
 import PhotoIcon from "@mui/icons-material/Photo";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { toast } from "react-toastify";
-import { Paperclip } from 'lucide-react';
-
+import { Paperclip } from "lucide-react";
 
 const ChatTextEditor = ({ connection }) => {
   const groupId = useSelector((state) => state.group.groupId);
@@ -16,9 +15,9 @@ const ChatTextEditor = ({ connection }) => {
   const inputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [file, setFile] = useState(null)
+  const [file, setFile] = useState(null);
 
-  console.log(file)
+  console.log(file);
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -44,7 +43,6 @@ const ChatTextEditor = ({ connection }) => {
   };
   const isButtonDisabled = !message.trim();
 
-
   const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
 
@@ -54,20 +52,24 @@ const ChatTextEditor = ({ connection }) => {
 
     setIsLoading(true);
 
-
     let formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("upload_preset", "TeamLink");
     formData.append("cloud_name", "daymlb11q");
     formData.append("folder", "TeamLink");
+    formData.append("use_filename", "true");
+    formData.append("unique_filename", "false");
 
     try {
-      const response = await fetch("https://api.cloudinary.com/v1_1/daymlb11q/auto/upload", {
-        method: "post",
-        body: formData,
-      });
-      const newurl = response.url
-      console.log("newurl", newurl)
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/daymlb11q/auto/upload",
+        {
+          method: "post",
+          body: formData,
+        }
+      );
+      const newurl = response.url;
+      console.log("newurl", newurl);
       const data = await response.json();
       setIsLoading(false);
 
@@ -79,7 +81,7 @@ const ChatTextEditor = ({ connection }) => {
 
         const messageData = {
           message: data.secure_url, // Use secure URL from Cloudinary response
-          type: 'photo',
+          type: "photo",
           sender: sender,
           username: username,
           time: time,
@@ -89,7 +91,7 @@ const ChatTextEditor = ({ connection }) => {
         if (connection && connection.readyState === connection.OPEN) {
           connection.send(JSON.stringify(messageData));
         } else {
-          console.error('WebSocket is not open');
+          console.error("WebSocket is not open");
           // Handle the case when WebSocket is not open (e.g., show an error message)
         }
       }
@@ -99,15 +101,12 @@ const ChatTextEditor = ({ connection }) => {
     }
   };
 
-
-
   return (
     <div className="fixed bottom-4 left-0 right-4 ml-auto max-w-[74rem] w-ful mt-4 ">
       <form
         onSubmit={sendMessage}
         className="flex items-center p-4 bg-[#323232] rounded-md shadow-md"
       >
-
         <label htmlFor="icon-button-file" className="cursor-pointer">
           <input
             id="icon-button-file"
@@ -117,7 +116,6 @@ const ChatTextEditor = ({ connection }) => {
             onChange={handleFileUpload}
           />
           <AttachFileIcon className="text-white" style={{ fontSize: 30 }} />
-          
         </label>
 
         <input

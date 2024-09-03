@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import SwipeableViews from "react-swipeable-views-react-18-fix"
+import SwipeableViews from "react-swipeable-views-react-18-fix";
 import { useTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
@@ -24,6 +24,7 @@ import "./WorkSpaceTabStyle.css";
 import ConfirmMessageModal from "../../../ConfirmMessageModals/RemoveUser";
 
 import CreateWorkspaceModal from "./CreateWorkspaceModal";
+
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -62,6 +63,11 @@ function a11yProps(index) {
 export default function WorkSpaceTabs() {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
+  const authenticatedUserId = useSelector((state) => state.authenticationUser.id);
+  const workspaceAdmin = useSelector((state) => state.workspace.workspaceAdmin);
+
+  console.log(authenticatedUserId, workspaceAdmin)
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -449,13 +455,19 @@ export default function WorkSpaceTabs() {
                     <span className="text-red-500 text-sm">(you)</span>
                   )}
                 </div>
-                {!member.is_admin &&
-                  member.user.id !== authenticated_user_id &&
-                  isWorkspaceAdmin && (
-                    <ConfirmMessageModal
-                      removeMember={() => removeMember(member.user.id)}
-                    />
-                  )}
+
+                {authenticatedUserId === workspaceAdmin && (
+                  <>
+                    {!member.is_admin &&
+                      member.user.id !== authenticated_user_id &&
+                      isWorkspaceAdmin && (
+                        <ConfirmMessageModal
+                          removeMember={() => removeMember(member.user.id)}
+                        />
+                      )}
+                  </>
+                )}
+                 
               </li>
             ))}
           </ul>

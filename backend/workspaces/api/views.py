@@ -59,7 +59,7 @@ class RemoveUser(APIView):
 
 class CreateWorkSpace(CreateAPIView):
     serializer_class = WorkSpaceSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         workspace = serializer.save(created_by=self.request.user, is_active=True)

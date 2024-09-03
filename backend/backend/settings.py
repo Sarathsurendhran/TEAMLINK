@@ -95,7 +95,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
     "TOKEN_OBTAIN_SERIALIZER": "users.api.serializers.MyTokenObtainPairSerializer",
-    # "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
     "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
     "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
@@ -220,19 +219,23 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
+# uahx rtoc udjg xwdw
 # Email Configuration
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "teamlinksmart@gmail.com"
-EMAIL_HOST_PASSWORD = "dohv iyad treq gdqu"
+EMAIL_HOST_USER = "teamlink904@gmail.com"
+EMAIL_HOST_PASSWORD = "uahx rtoc udjg xwdw"
+DEFAULT_FROM_EMAIL = "Celery <teamlink904@gmail.com>"
 
 
 # CELERY SETTINGS
-broker_url = 'redis://redis:6379/0'
+# broker_url = 'redis://redis:6379/0'
+# result_backend = 'redis://redis:6379/0'
+broker_url = 'redis://localhost:6379/'
+result_backend = 'redis://localhost:6379/'
 accept_content = ['json']  
 result_serializer = 'json'
 task_serializer = 'json'

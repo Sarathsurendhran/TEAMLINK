@@ -16,6 +16,8 @@ export default function OneToOneChat() {
 
   const { id, username } = useSelector((state) => state.authenticationUser);
   const [chatHistory, setChatHistory] = useState([]);
+  const [offset, setOffset] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
   const chatContainerRef = useRef(null);
 
   const selectedUser = useSelector((state) => state.selectedUser.selectedUser);
@@ -94,7 +96,7 @@ export default function OneToOneChat() {
 
     if (readyState === WebSocket.OPEN) {
       sendMessage(JSON.stringify(message));
-    } else {  
+    } else {
       console.log("Websocket is not open");
     }
   };
@@ -121,6 +123,15 @@ export default function OneToOneChat() {
     audioCall();
   }
 
+  const fetchOldMessages = () => {
+    const request = {
+      action:"load_more",
+      offset:offset,
+      limit:30
+    }
+    window.current.send(JSON.stringify(request))
+  }
+
   return (
     <>
       <div
@@ -129,61 +140,76 @@ export default function OneToOneChat() {
       >
         <div>
           <div className="flex-1 px-4 py-2 mt-24 mb-28 max-h-full ">
-            {chatHistory.length === 0 && (
-              <div className="text-white">No messages yet...</div>
-            )}
             {chatHistory.map((msg, index) => (
-              <div
-                key={index}
-                className={`mb-2 mr-4 flex ${
-                  msg.sender === id ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div className="max-w-sm">
-                  <div className="text-white font-medium">{msg.username}</div>
-                  <div className="bg-gray-800 text-white rounded-lg p-2 shadow mb-2 text-lg">
-                    {msg.message.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
-                      <img
-                        src={msg.message}
-                        alt="Message Content"
-                        className="max-w-full h-auto rounded"
-                      />
-                    ) : msg.message.match(/\.(mp3|wav|ogg|m4a)$/) ? (
-                      <audio
-                        key={index}
-                        controls
-                        className="max-w-full h-auto rounded"
-                      >
-                        <source
+              <>
+              
+                <div className="text-slate-400 flex justify-center items-center">
+                  {new Date(msg.time).toLocaleDateString()}
+                </div>
+                <div
+                  key={index}
+                  className={`mb-2 mr-4 flex ${
+                    msg.sender === id ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div className="max-w-sm">
+                    <div className="text-white font-medium">{msg.username}</div>
+                    <div className="bg-gray-800 text-white rounded-lg p-2 shadow mb-2 text-lg">
+                      {msg.message.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
+                        <img
                           src={msg.message}
-                          type={`audio/${msg.message.split(".").pop()}`}
+                          alt="Message Content"
+                          className="max-w-full h-auto rounded"
                         />
-                      </audio>
-                    ) : msg.message.match(/\.(mp4|webm|ogg|avi)$/) ? (
-                      <video controls className="max-w-full h-auto rounded">
-                        <source
-                          src={msg.message}
-                          type={`video/${msg.message.split(".").pop()}`}
-                        />
-                        Your browser does not support the video element.
-                      </video>
-                    ) : msg.message.match(/\.(docx|pdf|txt|xlsx|xls)$/) ? (
-                      <div className="flex items-center">
-                        <InsertDriveFileIcon className="mr-2" />
-                        <a
-                          href={msg.message}
-                          download
-                          className="text-blue-500 underline"
+                      ) : msg.message.match(/\.(mp3|wav|ogg|m4a)$/) ? (
+                        <audio
+                          key={index}
+                          controls
+                          className="max-w-full h-auto rounded"
                         >
-                          {msg.message.split("/").pop()}
-                        </a>
-                      </div>
-                    ) : (
-                      msg.message
-                    )}
+                          <source
+                            src={msg.message}
+                            type={`audio/${msg.message.split(".").pop()}`}
+                          />
+                        </audio>
+                      ) : msg.message.match(/\.(mp4|webm|ogg|avi)$/) ? (
+                        <video controls className="max-w-full h-auto rounded">
+                          <source
+                            src={msg.message}
+                            type={`video/${msg.message.split(".").pop()}`}
+                          />
+                          Your browser does not support the video element.
+                        </video>
+                      ) : msg.message.match(/\.(docx|pdf|txt|xlsx|xls)$/) ? (
+                        <div className="flex items-center">
+                          <InsertDriveFileIcon className="mr-2" />
+                          <a
+                            href={msg.message}
+                            download
+                            className="text-blue-500 underline"
+                          >
+                            {msg.message.split("/").pop()}
+                          </a>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="">
+                            <div className="mr-10 text-start ">
+                              {msg.message}
+                            </div>
+                            <div className="text-slate-400 text-xs min-w-8 text-end">
+                              {new Date(msg.time).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </>
             ))}
           </div>
         </div>

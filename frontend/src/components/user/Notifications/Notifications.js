@@ -19,7 +19,6 @@ export default function Notifications() {
   const [unreadCountForGroup, setUnreadCountForGroup] = useState(0);
   const [unreadCountForPersonal, setUnreadCountForPersonal] = useState(0);
 
-
   const handleClickOpen = (scrollType) => () => {
     setOpen(true);
     setScroll(scrollType);
@@ -58,7 +57,9 @@ export default function Notifications() {
   useEffect(() => {
     // Handle group notifications
     if (lastGroupMessage?.data) {
-      const notification = lastGroupMessage?.data ? JSON.parse(lastGroupMessage.data) : null;
+      const notification = lastGroupMessage?.data
+        ? JSON.parse(lastGroupMessage.data)
+        : null;
 
       if (notification.unread_count !== undefined) {
         if (notification.unread_count === 0) {
@@ -74,9 +75,7 @@ export default function Notifications() {
 
       setNotifications((prev) => [{ ...notification, type: "group" }, ...prev]);
     }
-
   }, [lastGroupMessage]);
-
 
   useEffect(() => {
     // Handle personal chat notifications
@@ -102,9 +101,6 @@ export default function Notifications() {
     }
   }, [lastPersonalMessage]);
 
-
-
-
   // Reset state when workspaceID changes
   useEffect(() => {
     setNotifications([]);
@@ -118,8 +114,6 @@ export default function Notifications() {
       ""
     );
   };
-
-
 
   return (
     <React.Fragment>
@@ -176,8 +170,8 @@ export default function Notifications() {
             tabIndex={-1}
             className="text-white"
           >
-            <List>
-           
+            {/* <List>
+            {notifications.length > 0 && (
               {notifications.map((notification, index) => (
                 <ListItem
                   key={index}
@@ -221,7 +215,59 @@ export default function Notifications() {
                   </div>
                 </ListItem>
               ))}
+            )}
             
+            </List> */}
+            <List>
+              {unreadCountForGroup + unreadCountForPersonal > 0 ? (
+                notifications.map((notification, index) => (
+                  <ListItem
+                    key={index}
+                    className="bg-gray-800 mb-2 cursor-pointer shadow-md hover:bg-gray-700 p-4"
+                  >
+                    <div>
+                      {notification.type === "group" ? (
+                        <>
+                          <h4 className="text-white text-xl mb-2 font-bold">
+                            {notification.group_name}
+                          </h4>
+                          <div className="flex flex-col">
+                            {notification.message && (
+                              <h4 className="text-white text-base mb-1">
+                                {notification.sender_name} sends a message
+                              </h4>
+                            )}
+                            {notification.time && (
+                              <h4 className="text-slate-400 text-xs">
+                                {formatTime(notification.time)}
+                              </h4>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex flex-col">
+                            {notification.message && (
+                              <h4 className="text-white text-base mb-1">
+                                {notification.sender_name} sends a message
+                              </h4>
+                            )}
+                            {notification.time && (
+                              <h4 className="text-slate-400 text-xs">
+                                {formatTime(notification.time)}
+                              </h4>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </ListItem>
+                ))
+              ) : (
+                <div className="text-white text-center p-4">
+                  No new notifications
+                </div>
+              )}
             </List>
           </DialogContentText>
         </DialogContent>

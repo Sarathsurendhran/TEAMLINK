@@ -106,12 +106,12 @@ const OTPInput = () => {
             Verify
           </button>
         </form>
-        <p>
+        {/* <p>
           Didn't receive the code?{' '}
           <a href="#" className="text-indigo-500">
             Resend
           </a>
-        </p>
+        </p> */}
       </div>
     </div>
   );

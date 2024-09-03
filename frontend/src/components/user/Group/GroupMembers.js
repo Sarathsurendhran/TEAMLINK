@@ -99,7 +99,13 @@ const GroupMembers = () => {
               )} */}
             </div>
 
-            {workspaceAdmin !== member.user_id &&
+            {/* {workspaceAdmin !== member.user_id &&
+              authenticated_user_id !== member.user_id && (
+                <ConfirmMessageModalForGroup
+                  removeMember={() => removeMember(member.member)}
+                />
+              )} */}
+            {authenticated_user_id === workspaceAdmin &&
               authenticated_user_id !== member.user_id && (
                 <ConfirmMessageModalForGroup
                   removeMember={() => removeMember(member.member)}

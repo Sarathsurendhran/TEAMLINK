@@ -8,13 +8,19 @@ import WorkspaceAddUsers from "./WorkspaceAddUsers/WorkspaceAddUsers";
 import WorkspaceSettingsModal from "./WorkspaceSettings/WorkspaceSettingsModal";
 import Notifications from "../Notifications/Notifications";
 
-
 import Avatar from "@mui/material/Avatar";
 import { useSelector } from "react-redux";
 
 const WorkspaceSidebar = () => {
   const profileImage = useSelector((state) => state.userProfile.profileImage);
   const baseURL = process.env.REACT_APP_baseURL;
+
+  const authenticatedUserId = useSelector(
+    (state) => state.authenticationUser.id
+  );
+  const workspaceAdmin = useSelector((state) => state.workspace.workspaceAdmin);
+
+  // console.log("authenticatedUserId", authenticatedUserId, "workspaceAdmin", workspaceAdmin)
 
   // ...............................handiling logout......................................
   const handleLogout = (event) => {
@@ -61,7 +67,6 @@ const WorkspaceSidebar = () => {
       handleProfileClose();
     }
   }, [open]);
-
 
   return (
     <>
@@ -152,9 +157,11 @@ const WorkspaceSidebar = () => {
 
                 <WorkSpaceUserList />
 
-                <WorkspaceAddUsers />
+                {authenticatedUserId === workspaceAdmin && (
+                  <WorkspaceAddUsers />
+                )}
 
-                <Notifications/>
+                <Notifications />
 
                 <li>
                   <button

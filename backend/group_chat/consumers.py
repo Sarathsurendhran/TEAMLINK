@@ -82,12 +82,6 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
     async def send_existing_messages(self):
         existing_messages = await self.get_existing_messages()
         for message in existing_messages:
-            # Convert datetime object to string
-            formatted_time = (
-                message["time"]
-                .astimezone(timezone.get_current_timezone())
-                .strftime("%Y-%m-%d %H:%M:%S")
-            )
 
             # Serialize to JSON
             await self.send(
@@ -96,7 +90,7 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
                         "message": message["message"],
                         "sender": message["sender"],
                         "username": message["username"],
-                        "time": formatted_time,
+                        "time": message['time'].strftime("%Y-%m-%d %H:%M:%S%z"),
                         "type": message["type"],
                     }
                 )
@@ -105,7 +99,7 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
     # function to getting the previous messages in the database
     @database_sync_to_async
     def get_existing_messages(self):
-        messages = GroupChatMessages.objects.filter(group=self.group_id)
+        messages = GroupChatMessages.objects.filter(group=self.group_id).order_by('time_stamp')
         return [
             {
                 "message": message.message,

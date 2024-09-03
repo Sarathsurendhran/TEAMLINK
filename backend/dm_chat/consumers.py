@@ -18,7 +18,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_name, self.channel_name)
         await self.accept()
 
-        existing_messages = await self.get_existing_messages()
+        existing_messages = await self.get_existing_messages(limit=30)
         for message in existing_messages:
             await self.send(text_data=json.dumps(message))
 
@@ -28,22 +28,32 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None):
         data = json.loads(text_data)
 
-        message = data.get("message", "")
-        sender = data.get("sender", "Anonymous")
-        time = data.get("time", timezone.now().strftime("%Y-%m-%d %H:%M:%S"))
-        message_type = data.get("type", "text_message")
-        link = data.get("link", "")
+        action = data.get("action", "")
 
-        if sender and message_type in ["text_message", "photo", "video"]:
-            await self.save_message(sender, message, message_type)
+        if action == "load_more":
+            offset = data.get("offset", 0)
+            limit = data.get("limit", 30)
+            older_messages = await self.get_existing_messages(limit=limit, offset=offset)
+            for message in older_messages:
+                await self.send(text_data=json.dumps(message))
+        else:
 
-        if message_type in ["video_call", "audio_call"]:
-            await self.send_call_link(link, sender, message_type)
+            message = data.get("message", "")
+            sender = data.get("sender", "Anonymous")
+            time = data.get("time", timezone.now().strftime("%Y-%m-%d %H:%M:%S"))
+            message_type = data.get("type", "text_message")
+            link = data.get("link", "")
 
-        await self.broadcast_message(message, sender, time, message_type)
+            if sender and message_type in ["text_message", "photo", "video"]:
+                await self.save_message(sender, message, message_type)
 
-        # Send a notification to the receiver
-        await self.notify_receiver(sender, message, time)
+            if message_type in ["video_call", "audio_call"]:
+                await self.send_call_link(link, sender, message_type)
+
+            await self.broadcast_message(message, sender, time, message_type)
+
+            # Send a notification to the receiver
+            await self.notify_receiver(sender, message, time)
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps(event["data"]))
@@ -121,15 +131,13 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         return sender_name.username
 
     @database_sync_to_async
-    def get_existing_messages(self):
-        messages = OneToOneChatMessages.objects.filter(room=self.room_name)
+    def get_existing_messages(self, limit=30, offset=0):
+        messages = OneToOneChatMessages.objects.filter(room=self.room_name)[offset:offset+limit]
         return [
             {
                 "message": message.message,
                 "sender": message.sender.id,
-                "time": message.time_stamp.astimezone(
-                    timezone.get_current_timezone()
-                ).strftime("%Y-%m-%d %H:%M:%S"),
+                "time": message.time_stamp.strftime("%Y-%m-%d %H:%M:%S%z"),
                 "type": message.type,
             }
             for message in messages
