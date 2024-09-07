@@ -48,7 +48,7 @@ const WorkspaceSettingsModal = () => {
     <div>
       <div className="px-6 mt-9">
         <a
-          className="flex-none text-2xl font-semibold text-white"
+          className="flex-none text-3xl  font-semibold text-white"
           href="#"
           onClick={handleOpen}
           aria-label="Brand"
@@ -58,6 +58,12 @@ const WorkspaceSettingsModal = () => {
           <ArrowDropDownSharpIcon />
         </a>
       </div>
+
+      {/* <div className="mt-6">
+        <hr className="border-slate-500" />
+      </div> */}
+
+
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -80,7 +86,6 @@ const WorkspaceSettingsModal = () => {
               component="h2"
             >
               Workspace Settings
-            
             </div>
 
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>

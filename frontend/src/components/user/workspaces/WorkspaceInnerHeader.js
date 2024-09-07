@@ -46,7 +46,7 @@ const WorkspaceInnerHeader = () => {
 
   return (
     <>
-      <nav className="fixed top-6 left-0 right-0 flex-1 p-2   bg-blue-950 h-14 ml-auto max-w-[78rem] flex justify-around items-center ">
+      <nav className="fixed top-6  left-0 right-0 flex-1 p-2   bg-[#0274BD] h-14 ml-auto max-w-[78rem] flex justify-around items-center ">
         <h3
           className="text-white ml-3 text-2xl font-sans font-bold cursor-pointer"
           onClick={selectedUserName ? undefined : handleOpen}

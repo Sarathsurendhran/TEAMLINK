@@ -74,10 +74,10 @@ const WorkspaceSidebar = () => {
 
       <div
         id="docs-sidebar"
-        className="bg-blue-950  h-screen mt-6 hs-overlay [--auto-close:lg] hs-overlay-open:translate-x-0 -translate-x-full transition-all duration-300 transform hidden fixed top-0 start-0 bottom-0 z-[60] w-80   pb-10  lg:block lg:translate-x-0 lg:end-auto lg:bottom-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300"
+        className="bg-[#0274BD]   mt-6  h-screen  hs-overlay [--auto-close:lg] hs-overlay-open:translate-x-0 -translate-x-full transition-all duration-300 transform hidden fixed top-0 start-0 bottom-0 z-[60] w-80   pb-10  lg:block lg:translate-x-0 lg:end-auto lg:bottom-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300"
       >
         <div className=" flex h-screen">
-          <div className="h-full bg-[#543ae9] w-14 border border-[#543ae9] flex justify-center items-end">
+          <div className="h-full  bg-[#0684d3] w-14  flex justify-center items-end">
             <div
               className="w-10 h-10 bg-blue-500 rounded-full border cursor-pointer mb-20"
               onClick={handleProfileOpen}
@@ -131,7 +131,7 @@ const WorkspaceSidebar = () => {
 
           <UserProfile open={open} toggleDrawer={toggleDrawer} />
 
-          <div className="flex-1 border border-blue-800">
+          <div className="flex-1 ">
             {/* <div className="px-6 mt-9">
               <a
                 className="flex-none text-2xl font-semibold text-white"
@@ -167,7 +167,7 @@ const WorkspaceSidebar = () => {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-500"
+                    className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-lg text-white rounded-lg hover:bg-gray-500"
                   >
                     <LogoutIcon /> Logout
                   </button>

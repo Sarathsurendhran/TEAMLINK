@@ -1,4 +1,4 @@
-
+from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from django.utils import timezone
@@ -6,6 +6,19 @@ from channels.db import database_sync_to_async
 from .models import OneToOneChatMessages
 from users.models import User
 from channels.layers import get_channel_layer
+from django.core.paginator import Paginator
+
+
+class ChatPaginator:
+    page_size = 10
+
+    def paginate_queryset(self, queryset, page_number):
+        paginator = Paginator(queryset, self.page_size)
+        page = paginator.get_page(page_number)
+        return page
+
+    def get_next_page_number(self, page):
+        return page.next_page_number() if page.has_next() else None
 
 
 class PersonalChatConsumer(AsyncWebsocketConsumer):
@@ -18,9 +31,9 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_name, self.channel_name)
         await self.accept()
 
-        existing_messages = await self.get_existing_messages(limit=30)
-        for message in existing_messages:
-            await self.send(text_data=json.dumps(message))
+        # existing_messages = await self.get_existing_messages(limit=2)
+        # for message in existing_messages:
+        #     await self.send(text_data=json.dumps(message))
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.room_name, self.channel_name)
@@ -31,11 +44,28 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         action = data.get("action", "")
 
         if action == "load_more":
-            offset = data.get("offset", 0)
-            limit = data.get("limit", 30)
-            older_messages = await self.get_existing_messages(limit=limit, offset=offset)
-            for message in older_messages:
-                await self.send(text_data=json.dumps(message))
+            page_number = data.get("page_number", 1)
+
+            paginated_data = await self.get_existing_messages(page_number)
+
+            # for message in paginated_data:
+            #     await self.send(text_data=json.dumps(message))
+
+            # Extract messages and the next cursor from the response
+            messages = paginated_data.get("messages", [])[::-1]
+            next_page_number = paginated_data.get("next_page_number", None)
+
+
+            # Prepare the payload to send back to the client
+            payload = {
+                "message_type": "paginated_messages",
+                "messages": messages,
+                "next_page_number": next_page_number,
+            }
+
+            # Send the payload as a JSON string to the client
+            await self.send(text_data=json.dumps(payload))
+
         else:
 
             message = data.get("message", "")
@@ -44,13 +74,14 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             message_type = data.get("type", "text_message")
             link = data.get("link", "")
 
-            if sender and message_type in ["text_message", "photo", "video"]:
+            if sender and message_type in ["text_message", "photo", "video", "audio", "file"]:
                 await self.save_message(sender, message, message_type)
 
             if message_type in ["video_call", "audio_call"]:
                 await self.send_call_link(link, sender, message_type)
 
             await self.broadcast_message(message, sender, time, message_type)
+
 
             # Send a notification to the receiver
             await self.notify_receiver(sender, message, time)
@@ -78,6 +109,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             {
                 "type": "chat_message",
                 "data": {
+                    "message_type": "real_time_message",
                     "message": message,
                     "sender": sender,
                     "time": time,
@@ -94,7 +126,6 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         receiver_id = await self.get_receiver_id(sender)
 
         sender_name = await self.get_sender_name(sender)
-
 
         # Get the channel layer
         channel_layer = get_channel_layer()
@@ -117,7 +148,6 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             },
         )
 
- 
     @database_sync_to_async
     def get_receiver_id(self, sender_id):
         # Assuming the other user in the chat is the receiver
@@ -130,24 +160,61 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         sender_name = User.objects.get(id=sender)
         return sender_name.username
 
+    # @database_sync_to_async
+    # def get_existing_messages(self, page_number):
+    #     paginator = ChatPaginator()
+
+    #     messages = OneToOneChatMessages.objects.filter(room=self.room_name).order_by(
+    #         "-time_stamp"
+    #     )
+
+    #     page = paginator.paginate_queryset(messages, page_number)
+
+    #     response = [
+    #         {
+    #             "message": message.message,
+    #             "sender": message.sender.id,
+    #             "time": message.time_stamp.strftime("%Y-%m-%d %H:%M:%S%z"),
+    #             "type": message.type,
+    #         }
+    #         for message in page
+    #     ]
+
+    #     return {
+    #         "messages": response,
+    #         "next_page_number": paginator.get_next_page_number(page),
+    #     }
+
     @database_sync_to_async
-    def get_existing_messages(self, limit=30, offset=0):
-        messages = OneToOneChatMessages.objects.filter(room=self.room_name)[offset:offset+limit]
-        return [
-            {
-                "message": message.message,
-                "sender": message.sender.id,
-                "time": message.time_stamp.strftime("%Y-%m-%d %H:%M:%S%z"),
-                "type": message.type,
-            }
-            for message in messages
-        ]
+    def get_existing_messages(self, page_number):
+        paginator = ChatPaginator()
+
+        messages = OneToOneChatMessages.objects.filter(
+            room=self.room_name
+        ).order_by("-time_stamp")
+
+        page = paginator.paginate_queryset(messages, page_number)
+
+        return {
+            "messages": [
+                {
+
+                    "message": message.message,
+                    "sender": message.sender_id,
+                    "time": message.time_stamp.isoformat(),
+                    "type": message.type,
+                }
+                for message in page
+            ],
+            "next_page_number": paginator.get_next_page_number(page),
+        }
+
+
 
     async def save_message(self, sender, message, message_type):
         sender_instance = await self.get_member_instance(sender)
         if sender_instance:
             await self.save_message_to_db(sender_instance, message, message_type)
-
 
     @database_sync_to_async
     def get_member_instance(self, member_id):
@@ -157,7 +224,6 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         except User.DoesNotExist:
             print("Member not found.")
         return None
-
 
     @database_sync_to_async
     def save_message_to_db(self, sender, message, message_type):
@@ -182,7 +248,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
         # Retrieve unread notifications upon connection
         unread_notifications, unread_count = await self.get_unread_notifications()
-        
 
         await self.send(text_data=json.dumps({"unread_count": unread_count}))
 
@@ -198,14 +263,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         # Send the notification to the WebSocket client
         notification = json.loads(event["value"])
 
+
         await self.send(text_data=json.dumps(notification))
-
-
 
     async def trigger_unread_notifications(self, event):
         # Retrieve unread notifications and count
         notifications, unread_count = await self.get_unread_notifications()
-
 
         # Send the unread count first
         await self.send(
@@ -215,8 +278,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 }
             )
         )
-
-
 
     @database_sync_to_async
     def get_unread_notifications(self):

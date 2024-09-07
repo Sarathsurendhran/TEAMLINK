@@ -102,42 +102,47 @@ const ChatTextEditor = ({ connection }) => {
   };
 
   return (
-    <div className="fixed bottom-4 left-0 right-4 ml-auto max-w-[74rem] w-ful mt-4 ">
-      <form
-        onSubmit={sendMessage}
-        className="flex items-center p-4 bg-[#323232] rounded-md shadow-md"
-      >
-        <label htmlFor="icon-button-file" className="cursor-pointer">
-          <input
-            id="icon-button-file"
-            type="file"
-            // accept="image/*"
-            className="hidden"
-            onChange={handleFileUpload}
-          />
-          <AttachFileIcon className="text-white" style={{ fontSize: 30 }} />
-        </label>
-
-        <input
-          type="text"
-          value={message} // Control the input value with state
-          onChange={(e) => setMessage(e.target.value)}
-          ref={inputRef}
-          placeholder="Type your message..."
-          className="flex-1 p-2 bg-[#323232] text-white rounded-md focus:outline-none focus:border-blue-500"
-        />
-
-        <button
-          className={`flex items-center gap-1 px-4 py-2 cursor-pointer font-semibold tracking-widest rounded-md ${
-            isButtonDisabled
-              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-500"
-          }`}
-          disabled={isButtonDisabled}
+    <div className="w-full flex justify-center">
+      <div className="fixed flex justify-center bottom-4 w-9/12  mt-4 mb-2 ">
+        <form
+          onSubmit={sendMessage}
+          className="flex items-center px-4 py-2 bg-white shadow-lg border border-gray-400  rounded-lg  w-10/12"
         >
-          <SendIcon />
-        </button>
-      </form>
+          <label htmlFor="icon-button-file" className="cursor-pointer">
+            <input
+              id="icon-button-file"
+              type="file"
+              // accept="image/*"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+            <AttachFileIcon
+              className="text-gray-600 "
+              style={{ fontSize: 25 }}
+            />
+          </label>
+
+          <input
+            type="text"
+            value={message} // Control the input value with state
+            onChange={(e) => setMessage(e.target.value)}
+            ref={inputRef}
+            placeholder="Type your message..."
+            className="flex-1 p-2 bg-white  text-gray-900 rounded-md focus:outline-none focus:border-blue-500"
+          />
+
+          <button
+            className={`flex items-center gap-1 px-2 cursor-pointer tracking-widest rounded-md ${
+              isButtonDisabled
+                ? "text-gray-600 cursor-not-allowed"
+                : "text-gray-600 "
+            }`}
+            disabled={isButtonDisabled}
+          >
+            <SendIcon sx={{ fontSize: 30 }} />
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

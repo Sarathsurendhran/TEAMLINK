@@ -103,13 +103,13 @@ const WorkspacesGroups = () => {
           <div className="flex items-center pt-1 space-x-2">
             <div className="flex items-center">
               {groupsOpen ? (
-                <ArrowDropDownSharpIcon style={{ fontSize: "24px" }} />
+                <ArrowDropDownSharpIcon style={{ fontSize: "35px" }} />
               ) : (
-                <ArrowRightSharpIcon style={{ fontSize: "24px" }} />
+                <ArrowRightSharpIcon style={{ fontSize: "35px" }} />
               )}
-              <Diversity3Icon sx={{ color: "white", marginLeft: "8px" }} />{" "}
+              <Diversity3Icon sx={{ color: "white", marginLeft: "3px" }} />{" "}
               {/* Adjust margin as needed */}
-              <span className="ml-1 text-white">Groups</span>{" "}
+              <span className="ml-1 text-base text-white">Groups</span>{" "}
               {/* Adjust margin and text color as needed */}
             </div>
           </div>

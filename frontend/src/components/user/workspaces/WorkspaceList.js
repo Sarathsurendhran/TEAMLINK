@@ -74,12 +74,12 @@ const WorkSpaces = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-blue-300 flex flex-col">
-        <header className="m-2 flex justify-between items-center p-4 rounded-lg bg-blue-200 ">
+      <div className="min-h-screen bg-[#0274BD]  flex flex-col">
+        <header className="m-2 flex justify-between items-center p-4 rounded-lg   ">
           <div className="ml-8">
             {/* <img src={logo} className="w-40 mx-auto" alt="Logo" /> */}
-            <h2 className="text-3xl text-[#5d40fd] font-bold">TeamLink</h2>
-            <span className="text-[#5d40fd] ">WORK SMARTER TOGETHER</span>
+            <h2 className="text-3xl text-gray-100 font-bold">TeamLink</h2>
+            <span className="text-gray-100 ">WORK SMARTER TOGETHER</span>
           </div>
           <div className="flex space-x-4">
             <Link to="/createworkspace">
@@ -97,13 +97,13 @@ const WorkSpaces = () => {
         </header>
 
         <main className="flex-grow ">
-          <div className="max-w-4xl mx-auto bg-blue-300  p-6 rounded ">
-            <h2 className="text-center mb-1 text-2xl md:text-6xl font-bold font-serif">
+          <div className="max-w-4xl mx-auto text-gray-100 p-6 rounded ">
+            <h2 className="text-center mb-3 text-2xl md:text-5xl font-bold ">
               Welcome back
             </h2>
-            <p className="text-center mb-2 text-base">
+            {/* <p className="text-center mb-2 text-base">
               Choose a workspace below to get back to working with your team.
-            </p>
+            </p> */}
             <h3 className="text-center text-lg mb-2 font-bold">
               Workspaces for {user ? user : ""}
             </h3>
@@ -129,7 +129,7 @@ const WorkSpaces = () => {
                 filteredData.map((workspace, index) => (
                   <div
                     key={index}
-                    className="w-full max-w-5xl p-3 rounded-lg bg-[#5d40fd] h-auto text-center flex items-start justify-between"
+                    className="w-full max-w-5xl p-3 rounded-lg bg-[#CCC7BF] h-auto text-center flex items-start justify-between"
                   >
                     <div className="flex flex-col items-start text-left p-2 max-w-xl ">
                       <h1 className="text-2xl font-bold font-sans text-white">

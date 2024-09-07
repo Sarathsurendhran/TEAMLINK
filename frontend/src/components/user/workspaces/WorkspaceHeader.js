@@ -24,7 +24,7 @@ const WorkspaceHeader = () => {
   
 
   return (
-    <nav className="bg-[#543ae9] border-blue-950 h-6 fixed top-0 left-0 right-0">
+    <nav className="bg-[#0684d3] border-blue-950 h-6 fixed top-0 left-0 right-0">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-12 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">

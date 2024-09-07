@@ -178,7 +178,7 @@ const Chat = () => {
   return (
     <>
       <div
-        className="h-screen bg-[#1f1e1f] flex ml-auto max-w-[76rem] flex-col overflow-y-scroll"
+        className="h-screen bg-[#e9e9e9] border flex ml-auto max-w-[76rem] flex-col overflow-y-scroll"
         ref={chatContainerRef}
       >
         <div>
@@ -189,13 +189,13 @@ const Chat = () => {
             {chatMessages.map((msg, index) => (
               <div
                 key={index}
-                className={`mb-2 mr-4 flex ${
-                  msg.sender === id ? "justify-end" : "justify-start"
+                className={`mb-2 mr-2 ml-2 flex ${
+                  msg.sender === id ? "justify-end " : "justify-start"
                 }`}
               >
                 <div className="max-w-sm">
-                  <div className="text-white font-medium">{msg.username}</div>
-                  <div className="bg-gray-800 text-white rounded-lg p-2 shadow mb-2 text-lg">
+                  <div className="text-slate-800 text-lg font-medium">{msg.username}</div>
+                  <div className="bg-white   text-black rounded-lg p-2 shadow-xl mb-2 text-lg">
                     {msg.message.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
                       <img
                         src={msg.message}
@@ -240,7 +240,7 @@ const Chat = () => {
                     ) : (
                       <div className="">
                         <div className="mr-10 text-start ">{msg.message}</div>
-                        <div className="text-slate-400 text-xs min-w-8 text-end">
+                        <div className="text-slate-900 text-xs min-w-8 text-end">
                           {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
 
                         </div>
@@ -265,8 +265,10 @@ const Chat = () => {
             roomId={groupId}
           />
         )}
-      </div>
+      <div className="flex justify-center items-center">
       <ChatTextEditor connection={connection} />
+      </div>
+      </div>
     </>
   );
 };
