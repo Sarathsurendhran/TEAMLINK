@@ -133,7 +133,7 @@ const Login = () => {
             <div className="mt-2 flex flex-col items-center">
               <h1 className="text-2xl xl:text-4xl font-extrabold">Sign In</h1>
               <div className="w-full flex-1 mt-6">
-                <div className="flex flex-col items-center">
+                {/* <div className="flex flex-col items-center">
                   <button className="w-full max-w-sm font-bold shadow-sm rounded-lg py-2 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline">
                     <div className="bg-white p-2 rounded-full">
                       <svg className="w-4" viewBox="0 0 533.5 544.3">
@@ -157,12 +157,12 @@ const Login = () => {
                     </div>
                     <span className="ml-4">Sign In with Google</span>
                   </button>
-                </div>
-                <div className="my-8 border-b text-center">
+                </div> */}
+                {/* <div className="my-8 border-b text-center">
                   <div className="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
                     Or sign in with e-mail
                   </div>
-                </div>
+                </div> */}
                 <form onSubmit={handleSubmit}>
                   <div className="mx-auto max-w-sm">
                     <input

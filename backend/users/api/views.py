@@ -43,8 +43,8 @@ class RegisterView(APIView):
 
                 email = serializer.data["email"]
 
-                send_otp.delay(email)
-
+                # send_otp.delay(email)
+                send_otp(email)
                 content = {
                     "message": "User registration successful. Check email for OTP."
                 }

@@ -119,7 +119,7 @@ export default function Notifications() {
     <React.Fragment>
       <button
         type="button"
-        className="w-full text-start flex justify-between items-center py-2 px-1.5 text-base text-white rounded-lg hover:bg-gray-500"
+        className="w-full text-start flex justify-between items-center py-2 px-1.5 text-base text-white rounded-lg hover:bg-gray-400"
         onClick={handleClickOpen("paper")}
       >
         <div className="flex items-center">

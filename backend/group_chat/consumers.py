@@ -10,6 +10,20 @@ from users.models import User
 from django.db.models import F
 from channels.layers import get_channel_layer
 from datetime import datetime
+from django.core.paginator import Paginator
+
+
+class ChatPaginator:
+    page_size = 10
+
+    def paginate_queryset(self, queryset, page_number):
+        paginator = Paginator(queryset, self.page_size)
+        page = paginator.get_page(page_number)
+        return page
+
+    def get_next_page_number(self, page):
+
+        return page.next_page_number() if page.has_next() else None
 
 
 class GroupChatConsumer(AsyncWebsocketConsumer):
@@ -19,46 +33,69 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-        # Send existing messages to the client
-        await self.send_existing_messages()
+        # # Send existing messages to the client
+        # await self.send_existing_messages()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        sender = text_data_json.get("sender", "Anonymous")
-        username = text_data_json.get("username", "unknown")
-        time = text_data_json.get("time", "unknown")
-        type = text_data_json.get("type", "text_message")
 
-        if type == "video_call":
-            await self.video_link_receive(username, sender)
+        action = text_data_json.get("action", "")
+        page_number = text_data_json.get("page_number", 1)
 
-        if type == "audio_call":
-            await self.audio_link_receive(username, sender)
+        if action == "load_more":
 
-        # Save the message to the database
-        await self.save_message(sender, message)
+            paginated_data = await self.get_existing_messages(page_number)
 
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": "chat.message",
-                "data": {
-                    "message": message,
-                    "sender": sender,
-                    "username": username,
-                    "time": time,
-                    "type": type,
+            messages = paginated_data.get("messages", [])[::-1]
+            next_page_number = paginated_data.get("next_page_number", None)
+
+            # Prepare the payload to send back to the client
+            payload = {
+                "message_type": "paginated_messages",
+                "messages": messages,
+                "next_page_number": next_page_number,
+            }
+
+            # Send the payload as a JSON string to the client
+            await self.send(text_data=json.dumps(payload))
+        else:
+
+            message = text_data_json["message"]
+            sender = text_data_json.get("sender", "Anonymous")
+            username = text_data_json.get("username", "unknown")
+            time = text_data_json.get("time", "unknown")
+            type = text_data_json.get("type", "text_message")
+
+            if type == "video_call":
+                await self.video_link_receive(username, sender)
+
+            if type == "audio_call":
+                await self.audio_link_receive(username, sender)
+
+            # Save the message to the database
+            await self.save_message(sender, message)
+
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "chat.message",
+                    "data": {
+                        "message_type": "real_time_message",
+                        "message": message,
+                        "sender": sender,
+                        "username": username,
+                        "time": time,
+                        "type": type,
+                    },
                 },
-            },
-        )
+            )
 
-        # Notify group members except the sender
-        await self.notify_group_members(sender, message, time)
+            # Notify group members except the sender
+            await self.notify_group_members(sender, message, time)
 
     async def chat_message(self, event):
         message = event["data"]["message"]
@@ -70,6 +107,7 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=json.dumps(
                 {
+                    "message_type": "real_time_message",
                     "message": message,
                     "sender": sender,
                     "username": username,
@@ -79,37 +117,46 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def send_existing_messages(self):
-        existing_messages = await self.get_existing_messages()
-        for message in existing_messages:
+    # async def send_existing_messages(self):
+    #     existing_messages = await self.get_existing_messages()
+    #     for message in existing_messages:
 
-            # Serialize to JSON
-            await self.send(
-                text_data=json.dumps(
-                    {
-                        "message": message["message"],
-                        "sender": message["sender"],
-                        "username": message["username"],
-                        "time": message['time'].strftime("%Y-%m-%d %H:%M:%S%z"),
-                        "type": message["type"],
-                    }
-                )
-            )
+    #         # Serialize to JSON
+    #         await self.send(
+    #             text_data=json.dumps(
+    #                 {
+    #                     "message": message["message"],
+    #                     "sender": message["sender"],
+    #                     "username": message["username"],
+    #                     "time": message["time"].strftime("%Y-%m-%d %H:%M:%S%z"),
+    #                     "type": message["type"],
+    #                 }
+    #             )
+    #         )
 
     # function to getting the previous messages in the database
     @database_sync_to_async
-    def get_existing_messages(self):
-        messages = GroupChatMessages.objects.filter(group=self.group_id).order_by('time_stamp')
-        return [
-            {
-                "message": message.message,
-                "sender": message.sender.id,
-                "username": message.sender.username,
-                "time": message.time_stamp,
-                "type": message.type,
-            }
-            for message in messages
-        ]
+    def get_existing_messages(self, page_number):
+        paginator = ChatPaginator()
+        messages = GroupChatMessages.objects.filter(group=self.group_id).order_by(
+            "-time_stamp"
+        )
+        page = paginator.paginate_queryset(messages, page_number)
+
+        return {
+            "messages": [
+                {
+                    "message": message.message,
+                    "sender": message.sender.id,
+                    "username": message.sender.username,
+                    "time": message.time_stamp.isoformat(),
+                    "type": message.type,
+                }
+                for message in page
+            ],
+            "next_page_number": paginator.get_next_page_number(page),
+        }
+
 
     async def save_message(self, sender, message):
         """
@@ -348,12 +395,13 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         # Parse the JSON string in the `value` field
         data = json.loads(event["value"])
 
+
         # Access individual fields from the parsed data
         count = data.get("count")
         message = data.get("message")
         group_id = data.get("group_id")
         sender = data.get("sender")
-        time = data.get("time").isoformat()
+        time = data.get("time")
         sender_name = data.get("sender_name")
         group_name = data.get("group_name")
 
@@ -364,7 +412,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                     {
                         "message": message,
                         "unread_count": count,
-                        "time": time,
+                        "time": time.isoformat(),
                         "sender_name": sender_name,
                         "group_name": group_name,
                     }

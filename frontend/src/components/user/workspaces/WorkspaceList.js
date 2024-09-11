@@ -129,14 +129,14 @@ const WorkSpaces = () => {
                 filteredData.map((workspace, index) => (
                   <div
                     key={index}
-                    className="w-full max-w-5xl p-3 rounded-lg bg-[#CCC7BF] h-auto text-center flex items-start justify-between"
+                    className="w-full max-w-5xl p-3 rounded-lg bg-[#ffffff] h-auto text-center flex items-start justify-between"
                   >
                     <div className="flex flex-col items-start text-left p-2 max-w-xl ">
-                      <h1 className="text-2xl font-bold font-sans text-white">
+                      <h1 className="text-2xl font-bold font-sans text-black">
                         {workspace.workspace_name}
                       </h1>
 
-                      <h2 className="text-xl text-white">
+                      <h2 className="text-xl text-black">
                         {workspace.description}
                       </h2>
                     </div>

@@ -84,7 +84,7 @@ export default function WorkspaceAddUsers() {
     <div>
       <button
         type="button"
-        className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-base text-white rounded-lg hover:bg-gray-500"
+        className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-base text-white rounded-lg hover:bg-gray-400"
         onClick={handleOpen}
       >
         <PersonAddAltIcon sx={{ color: "white" }} />

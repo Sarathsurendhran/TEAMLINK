@@ -167,7 +167,7 @@ const WorkspaceSidebar = () => {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-lg text-white rounded-lg hover:bg-gray-500"
+                    className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-lg text-white rounded-lg hover:bg-gray-400"
                   >
                     <LogoutIcon /> Logout
                   </button>

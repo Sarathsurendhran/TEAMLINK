@@ -57,6 +57,8 @@ const OneToOneChatTextEditor = ({ sendMessage, readyState }) => {
     formData.append("upload_preset", "TeamLink");
     formData.append("cloud_name", "daymlb11q");
     formData.append("folder", "OneToOneChatData");
+    formData.append("use_filename", "true");
+    formData.append("unique_filename", "false");
 
     try {
       const response = await fetch(

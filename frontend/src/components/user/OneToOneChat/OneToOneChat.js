@@ -21,10 +21,6 @@ export default function OneToOneChat() {
   const [pageNumber, setPageNumber] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const chatContainerRef = useRef(null);
-  const [isLoadingOldMessages, setIsLoadingOldMessages] = useState(false);
-
-  const previousScrollHeightRef = useRef(0);
-  const previousScrollTopRef = useRef(0);
 
   const selectedUser = useSelector((state) => state.selectedUser.selectedUser);
   const selectedUserName = useSelector(
@@ -66,29 +62,26 @@ export default function OneToOneChat() {
     );
   };
 
+  console.log("pageNumber", pageNumber)
+
   const loadMoreMessages = () => {
     if (!hasMore || isLoadingMore) return;
 
     setIsLoadingMore(true);
-    setIsLoadingOldMessages(true);
+    // setIsLoadingOldMessages(false);
 
-    const chatContainer = chatContainerRef.current;
-    // Store the current scrollTop and scrollHeight in refs
-    if (chatContainer) {
-      previousScrollHeightRef.current = chatContainer.scrollHeight;
-      previousScrollTopRef.current = chatContainer.scrollTop;
-
-      console.log("Captured ScrollTop:", previousScrollTopRef.current);
-      console.log("Captured ScrollHeight:", previousScrollHeightRef.current);
-    }
     sendMessage(
-      JSON.stringify({ action: "load_more", page_number: pageNumber + 1 })
+      JSON.stringify({ action: "load_more", page_number: pageNumber })
     );
   };
+
+
 
   useEffect(() => {
     if (lastMessage?.data) {
       const messageData = JSON.parse(lastMessage.data);
+
+      console.log(messageData)
 
       if (messageData.type === "video_call") {
         if (messageData.sender === id) {
@@ -109,50 +102,24 @@ export default function OneToOneChat() {
         setPageNumber(messageData.next_page_number || pageNumber);
         setHasMore(Boolean(messageData.next_page_number));
 
-        // Restore the scroll position
-        const chatContainer = chatContainerRef.current;
-        if (chatContainer) {
-          const newScrollHeight = chatContainer.scrollHeight;
-
-          console.log(
-            "Previous Scroll Height:",
-            previousScrollHeightRef.current
-          );
-          console.log("New Scroll Height:", newScrollHeight);
-          console.log("Previous Scroll Top:", previousScrollTopRef.current);
-
-          const heightDifference =
-            newScrollHeight - previousScrollHeightRef.current;
-
-          console.log("Height Difference:", heightDifference);
-
-          chatContainer.scrollTop =
-            previousScrollTopRef.current + newScrollHeight;
-
-          console.log("Updated Scroll Top:", chatContainer.scrollTop);
-        }
         setIsLoadingMore(false);
-        setIsLoadingOldMessages(false);
+
+        if (chatContainerRef.current) {
+          const chatContainer = chatContainerRef.current;
+          const offset = 50; 
+          chatContainer.scrollTop = offset;
+        }
+        
+
       } else if (messageData.message_type === "real_time_message") {
         setChatHistory((prev) => [...prev, messageData]);
+        if (chatContainerRef.current) {
+          const chatContainer = chatContainerRef.current;
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
       }
     }
   }, [lastMessage]);
-
-  // useEffect(() => {
-  //   if (chatContainerRef.current) {
-  //     if (isLoadingOldMessages) {
-  //       // Retain scroll position when loading more messages
-  //       const previousHeight = chatContainerRef.current.scrollHeight;
-  //       chatContainerRef.current.scrollTop =
-  //         chatContainerRef.current.scrollHeight - previousHeight;
-  //     } else {
-  //       // Scroll to bottom when a new message is sent
-  //       chatContainerRef.current.scrollTop =
-  //         chatContainerRef.current.scrollHeight;
-  //     }
-  //   }
-  // }, [chatHistory, isLoadingOldMessages]);
 
   const handleScroll = () => {
     if (
@@ -177,7 +144,7 @@ export default function OneToOneChat() {
         chatContainer.removeEventListener("scroll", handleScroll);
       }
     };
-  }, [hasMore, isLoadingMore, isLoadingOldMessages]);
+  }, [hasMore, isLoadingMore]);
 
   //------------------------------------call--------------------------------
   const videoCall = () => {
