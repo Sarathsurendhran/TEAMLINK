@@ -1,11 +1,10 @@
-# Use the official Node.js image as the base image
-FROM node:20-alpine
+# Stage 1: Build the React application
+FROM node:20-alpine as builder
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files first
-# This step is optimized for Docker's caching mechanism
+# Copy the package.json and package-lock.json files first (for Docker cache)
 COPY package*.json ./
 
 # Install dependencies
@@ -14,8 +13,17 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 3000
+# Build the React app
+RUN npm run build
 
-# Start the React application in development mode
-CMD ["npm", "start"]
+# Stage 2: Serve the React app using Nginx
+FROM nginx:alpine
+
+# Copy the build output from the previous stage
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Expose port 80 for serving the app
+EXPOSE 80
+
+# Start Nginx and keep it running in the foreground
+CMD ["nginx", "-g", "daemon off;"]

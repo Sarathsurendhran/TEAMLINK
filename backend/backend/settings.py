@@ -22,12 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-fk_y9f(&&qyxl(5&sht-5)dw%)_2ew)=n%qk&h9s=h&51*^j9t"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS")
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -118,13 +121,8 @@ MIDDLEWARE = [
 ]
 
 # Allow all origins
+# CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
-
-CORS_ORIGIN_WHITELIST = ("http://localhost:3000",)
 CORS_ALLOW_CREDENTIALS = True
 
 
@@ -151,27 +149,29 @@ TEMPLATES = [
 ASGI_APPLICATION = "backend.asgi.application"
 
 
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
-        # "CONFIG": {"hosts": [("redis", 6379)]},
+        "CONFIG": {"hosts": [(os.environ.get("REDIS_HOST", "127.0.0.1"))]},
     }
 }
+
 
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "TeamLink",
-        "USER": "postgres",
-        "PASSWORD": "admin@123",
-        "HOST": "localhost",
-        # "HOST":"host.docker.internal",
-        "PORT": "5433",
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT"),
     }
 }
 
@@ -229,17 +229,17 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "teamlink904@gmail.com"
-EMAIL_HOST_PASSWORD = "uahx rtoc udjg xwdw"
-DEFAULT_FROM_EMAIL = "Celery <teamlink904@gmail.com>"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "teamlink904@gmail.com")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "default-password")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Celery <teamlink904@gmail.com>")
+
 
 
 # CELERY SETTINGS
-# broker_url = 'redis://redis:6379/0'
-# result_backend = 'redis://redis:6379/0'
-broker_url = 'redis://localhost:6379/'
-result_backend = 'redis://localhost:6379/'
+broker_url = os.environ.get("CELERY_BROKER_URL", 'redis://localhost:6379/0')
+result_backend = os.environ.get("CELERY_RESULT_BACKEND", 'redis://localhost:6379/0')
 accept_content = ['json']  
 result_serializer = 'json'
 task_serializer = 'json'
 timezone = 'Asia/Kolkata'
+

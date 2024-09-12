@@ -1,5 +1,6 @@
 # Ignore node_modules directory
-node_modules/
+/frontend/node_modules/
+
 
 # Ignore Python virtual environment
 venv/
@@ -14,8 +15,8 @@ __pycache__/
 *.db
 
 # Ignore frontend build artifacts
-frontend/build/
-frontend/node_modules/
+/frontend/build/
+/frontend/node_modules/
 
 # Ignore .env files (if sensitive data is stored)
 .env
