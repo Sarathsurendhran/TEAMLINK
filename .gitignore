@@ -24,8 +24,9 @@ ENV/
 env.bak/
 venv.bak/
 .python-version
-.myenv/
 .Python
+.myenv/ 
+myenv/ 
 
 # Distribution / packaging
 build/
