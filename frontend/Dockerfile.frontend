@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy the package.json and package-lock.json files first (for Docker cache)
 COPY package*.json ./
 
+# Increase Node.js memory limit to avoid "JavaScript heap out of memory" errors
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Install dependencies
 RUN npm install
 
