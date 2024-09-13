@@ -3,7 +3,7 @@ import { Routes, Outlet, Route, useNavigate } from "react-router-dom";
 import OTP from "../user/auth/otp_verification";
 import Register from "../user/auth/Register";
 import Login from "../user/auth/login";
-import CreateWorkSpace from "../user/workspaces/CreateWorkspace";
+import CreateWorkSpace from "../user/workspaces/createworkspace";
 import WorkSpaces from "../user/workspaces/WorkspaceList";
 import WorkspaceHome from "../user/workspaces/WorkspaceHome";
 import PrivateRoutes from "../private_routes/private_routes";
