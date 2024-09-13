@@ -91,6 +91,3 @@ frontend/.pnp
 *.sublime-workspace
 *.sublime-project
 
-# Docker-related files
-Dockerfile*
-docker-compose*.yml
