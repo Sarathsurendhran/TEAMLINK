@@ -19,7 +19,7 @@ import SelectedUser from "./SelectedUser/SelectedUser";
 
 // Configure the encryption transform for workspace
 const encryptor = encryptTransform({
-  secretKey: process.env.REACT_APP_SECRET_KEY,
+  secretKey: process.env.REACT_APP_ENCRYPTION_KEY,
   onError: function (error) {
     console.error("Encryption error:", error);
   },
