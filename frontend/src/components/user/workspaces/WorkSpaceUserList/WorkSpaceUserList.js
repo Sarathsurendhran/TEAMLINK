@@ -218,7 +218,7 @@ const WorkSpaceUserList = () => {
         config
       );
       if (res.status === 200) {
-        toast.success(res.data.message);
+        // toast.success(res.data.message);
 
         const workspace_data = res.data.workspace_data;
         setWorkspaceData(workspace_data);

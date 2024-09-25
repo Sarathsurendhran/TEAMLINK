@@ -6,10 +6,13 @@ import WorkSpaceUserList from "./WorkSpaceUserList/WorkSpaceUserList";
 import WorkspacesGroups from "./WorkspaceGroups/WorkspacesGroups";
 import WorkspaceAddUsers from "./WorkspaceAddUsers/WorkspaceAddUsers";
 import WorkspaceSettingsModal from "./WorkspaceSettings/WorkspaceSettingsModal";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import Notifications from "../Notifications/Notifications";
 
 import Avatar from "@mui/material/Avatar";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const WorkspaceSidebar = () => {
   const profileImage = useSelector((state) => state.userProfile.profileImage);
@@ -21,6 +24,8 @@ const WorkspaceSidebar = () => {
   const workspaceAdmin = useSelector((state) => state.workspace.workspaceAdmin);
 
   // console.log("authenticatedUserId", authenticatedUserId, "workspaceAdmin", workspaceAdmin)
+
+  const navigate = useNavigate();
 
   // ...............................handiling logout......................................
   const handleLogout = (event) => {
@@ -67,6 +72,16 @@ const WorkspaceSidebar = () => {
       handleProfileClose();
     }
   }, [open]);
+
+  const handleAssignedTask = () => {
+    navigate("assigned-tasks");
+  };
+
+  
+  const handleTask = () => {
+    navigate("tasks");
+  };
+
 
   return (
     <>
@@ -131,7 +146,7 @@ const WorkspaceSidebar = () => {
 
           <UserProfile open={open} toggleDrawer={toggleDrawer} />
 
-          <div className="flex-1 ">
+          <div className="flex-1 max-h-full ">
             {/* <div className="px-6 mt-9">
               <a
                 className="flex-none text-2xl font-semibold text-white"
@@ -147,33 +162,59 @@ const WorkspaceSidebar = () => {
             </div> */}
 
             <WorkspaceSettingsModal />
+            <div className="overflow-auto  h-[calc(100vh-100px)]">
+              <nav
+                className="hs-accordion-group  p-6 w-full flex flex-col flex-wrap"
+                data-hs-accordion-always-open=""
+              >
+                <ul className="space-y-1.5 ">
+                  <WorkspacesGroups />
 
-            <nav
-              className="hs-accordion-group p-6 w-full flex flex-col flex-wrap"
-              data-hs-accordion-always-open=""
-            >
-              <ul className="space-y-1.5 ">
-                <WorkspacesGroups />
+                  <WorkSpaceUserList />
+                  
+                  <Notifications/>
 
-                <WorkSpaceUserList />
+                  {authenticatedUserId === workspaceAdmin && (
+                    <>
+                      <WorkspaceAddUsers />
 
-                {authenticatedUserId === workspaceAdmin && (
-                  <WorkspaceAddUsers />
-                )}
+                      <button
+                        type="button"
+                        className="w-full text-start flex items-center gap-x-2 py-2 px-2 text-base text-white rounded-lg hover:bg-gray-400"
+                        onClick={handleAssignedTask}
+                      >
+                        <AssignmentOutlinedIcon sx={{ color: "white" }} />
+                        Assigned Tasks
+                      </button>
+                    </>
+                  )}
+                  {authenticatedUserId != workspaceAdmin && (
+                    <>
+                  
+                      <button
+                        type="button"
+                        className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-base text-white rounded-lg hover:bg-gray-400"
+                        onClick={handleTask}
+                      >
+                        <FormatListBulletedOutlinedIcon sx={{ color: "white" }} />
+                        Tasks
+                      </button>
+                    </>
+                  )}
 
-                <Notifications />
 
-                <li>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-lg text-white rounded-lg hover:bg-gray-400"
-                  >
-                    <LogoutIcon /> Logout
-                  </button>
-                </li>
-              </ul>
-            </nav>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full text-start flex items-center gap-x-2 py-2 px-2.5 text-lg text-white rounded-lg hover:bg-gray-400"
+                    >
+                      <LogoutIcon /> Logout
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div>
         </div>
       </div>

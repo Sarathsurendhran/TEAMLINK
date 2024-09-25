@@ -21,11 +21,11 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin-login/', admin.site.urls),
-    path('user/', include('users.api.urls')),
-    path('workspace/', include('workspaces.api.urls')),
-    path('admin/', include('admin_side.api.urls')),
-    path('group/', include('group_chat.api.urls')),
-    path('dm-chat/', include('dm_chat.api.urls'))
+    path('api/user/', include('users.api.urls')),
+    path('api/workspace/', include('workspaces.api.urls')),
+    path('api/admin/', include('admin_side.api.urls')),
+    path('api/group/', include('group_chat.api.urls')),
+    path('api/dm-chat/', include('dm_chat.api.urls'))
 ]
 
 if settings.DEBUG:

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from workspaces.models import WorkSpaceMembers, WorkSpaces
-from group_chat.models import WorkspaceGroups, GroupMembers
+from group_chat.models import WorkspaceGroups, GroupMembers, Task
 
 
 class CreateGroupSerializer(serializers.ModelSerializer):
@@ -50,3 +50,27 @@ class GroupMembersSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupMembers
         fields = "__all__"
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    group_name = serializers.CharField(source="group.group_name", read_only=True)
+    assigned_to_username = serializers.CharField(
+        source="assigned_to.username", read_only=True
+    )
+
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "task_name",
+            "task_description",
+            "start_date",
+            "end_date",
+            "assigned_by",
+            "assigned_to",
+            "assigned_to_username",
+            "group",
+            "group_name",
+            "status",
+            "workspace"
+        ]

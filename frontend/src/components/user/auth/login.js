@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { setAuthentication } from "../../../Redux/Authentication/authenticationSlice";
+// import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const baseURL = process.env.REACT_APP_baseURL;
@@ -20,14 +21,14 @@ const Login = () => {
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!email){
-      toast.warning("Email Cannot Be Empty!")
-      return false
+    if (!email) {
+      toast.warning("Email Cannot Be Empty!");
+      return false;
     }
 
-    if (!password){
-      toast.warning("Password Cannot Be Empty!")
-      return false
+    if (!password) {
+      toast.warning("Password Cannot Be Empty!");
+      return false;
     }
 
     if (!emailPattern.test(email)) {
@@ -122,6 +123,15 @@ const Login = () => {
     setErrors(errors);
   };
 
+  // const handleGoogleAuth = useGoogleLogin({
+  //   onSuccess: (tokenResponse) => {
+  //     console.log("Google Token:", tokenResponse);
+  //     // You can use this token for authentication or send it to your backend
+  //   },
+  //   onError: () => {
+  //     console.log("Login Failed");
+  //   },
+  // });
   return (
     <>
       <div className="w-full text-gray-900 flex justify-center sm:px-10 lg:px-40 xl:px-80">
@@ -134,7 +144,10 @@ const Login = () => {
               <h1 className="text-2xl xl:text-4xl font-extrabold">Sign In</h1>
               <div className="w-full flex-1 mt-6">
                 {/* <div className="flex flex-col items-center">
-                  <button className="w-full max-w-sm font-bold shadow-sm rounded-lg py-2 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline">
+                  <button
+                    className="w-full max-w-sm font-bold shadow-sm rounded-lg py-2 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline"
+                    onClick={handleGoogleAuth}
+                  >
                     <div className="bg-white p-2 rounded-full">
                       <svg className="w-4" viewBox="0 0 533.5 544.3">
                         <path

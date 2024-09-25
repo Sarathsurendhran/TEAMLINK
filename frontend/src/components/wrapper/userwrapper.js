@@ -18,12 +18,16 @@ import WorkspaceIsblocked from "./checking_workspace_isblocked";
 import { useRoutes } from "react-router-dom";
 import Chat from "../user/Group/GroupChat/GroupChat";
 import OneToOneChat from "../user/OneToOneChat/OneToOneChat";
+import AssignedTaskTables from "../user/TaskManagement/AssinedTask";
+import Tasks from "../user/TaskManagement/Tasks";
 
 import GroupVideoCall from "../user/Group/GroupCall/GroupVideoCall";
 import GroupAudioCall from "../user/Group/GroupCall/GroupAudioCall";
 
 import OneToOneVideoCall from "../user/OneToOneChat/OneToOneCall/OneToOneVideoCall";
 import OneToOneAudioCall from "../user/OneToOneChat/OneToOneCall/OneToOneAudioCall";
+
+import WorkspaceAdminPrivateRoute from "../private_routes/WorkspaceAdminPrivateRoute";
 
 const UserWrapper = () => {
   const authentication_user = useSelector((state) => state.authentication_user);
@@ -61,6 +65,18 @@ const UserWrapper = () => {
       children: [
         { path: "chat", element: <Chat /> },
         { path: "one-to-one-chat", element: <OneToOneChat /> },
+        {
+          path: "assigned-tasks",
+          element: (
+            <WorkspaceAdminPrivateRoute>
+              <AssignedTaskTables />
+            </WorkspaceAdminPrivateRoute>
+          ),
+        },
+        {
+          path: "tasks",
+          element: <Tasks />,
+        },
       ],
     },
 
@@ -126,20 +142,20 @@ const UserWrapper = () => {
     },
     {
       path: "/one-to-one-video/:roomId",
-      element:(
+      element: (
         <PrivateRoutes>
-          <OneToOneVideoCall/>
+          <OneToOneVideoCall />
         </PrivateRoutes>
-      )
+      ),
     },
     {
       path: "/one-to-one-audio/:roomId",
-      element:(
+      element: (
         <PrivateRoutes>
-          <OneToOneAudioCall/>
+          <OneToOneAudioCall />
         </PrivateRoutes>
-      )
-    }
+      ),
+    },
   ]);
 
   return routes;

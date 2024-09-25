@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=backend.settings
 
 # Set the working directory
 WORKDIR /app
@@ -40,5 +41,8 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy project files
 COPY . /app/
 
-# Use gunicorn to serve the Django app
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "backend.wsgi:application", "--workers", "3"]
+# Ensure Gunicorn and Daphne are available
+RUN pip install gunicorn daphne channels-redis
+
+# Command to run both Gunicorn and Daphne in parallel
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:8000 backend.wsgi:application --workers 3 & daphne -u /tmp/daphne.sock backend.asgi:application"]

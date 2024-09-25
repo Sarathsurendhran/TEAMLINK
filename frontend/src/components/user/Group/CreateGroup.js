@@ -140,13 +140,7 @@ export default function CreateGroupModal({ fetchGroupsData }) {
 
   return (
     <div>
-      <Button
-        variant="contained"
-        color="success"
-        onClick={handleGroupModalOpen}
-      >
-        Create new Group
-      </Button>
+      <button className="bg-green-500 text-white p-1 pl-5 pr-5 rounded ml-4" onClick={handleGroupModalOpen}> Create new Group</button>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"

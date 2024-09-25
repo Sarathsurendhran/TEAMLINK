@@ -1,15 +1,17 @@
+from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from workspaces.models import WorkSpaceMembers, WorkSpaces
-from group_chat.models import WorkspaceGroups, GroupChatMessages, GroupMembers
+from group_chat.models import WorkspaceGroups, GroupChatMessages, GroupMembers, Task
 from users.models import User
 
 from .serializers import (
     CreateGroupSerializer,
     WorkspaceGroupSerializer,
     GroupMembersSerializer,
+    TaskSerializer,
 )
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
@@ -17,6 +19,17 @@ from django.shortcuts import get_object_or_404
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json
+
+from rest_framework.generics import (
+    ListAPIView,
+    CreateAPIView,
+    UpdateAPIView,
+    RetrieveAPIView,
+    DestroyAPIView,
+)
+from rest_framework.exceptions import ValidationError
+
+from django.shortcuts import get_object_or_404
 
 
 class CreateGroupView(APIView):
@@ -322,7 +335,6 @@ class ReadStatusUpdate(APIView):
                 {"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
-
     def trigger_unread_notification(self, group_id):
         channel_layer = get_channel_layer()
         group_name = f"notification_{group_id}"
@@ -331,6 +343,133 @@ class ReadStatusUpdate(APIView):
         async_to_sync(channel_layer.group_send)(
             group_name,
             {
-                "type": "trigger_unread_notifications",  
+                "type": "trigger_unread_notifications",
             },
         )
+
+
+class GetMembersList(ListAPIView):
+    serializer_class = GroupMembersSerializer
+
+    def list(self, request):
+        group_id = self.request.query_params.get("groupID")
+        workspace_id = self.request.query_params.get("workspaceID")
+
+        if not group_id and workspace_id:
+            raise ValidationError("Both groupID and workspaceID are required")
+
+        queryset = GroupMembers.objects.filter(
+            group=group_id, group__workspace=workspace_id
+        )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AssignTaskView(CreateAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class GetTaskView(ListAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        workspace_id = self.request.query_params.get("workspaceID")
+        return Task.objects.filter(workspace=workspace_id).order_by("-id")
+
+
+class GetUserTaskView(ListAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        workspace_id = self.request.query_params.get("workspaceID")
+        user_id = self.request.query_params.get("authenticatedUser")
+        return Task.objects.filter(
+            workspace=workspace_id, assigned_to=user_id
+        ).order_by("-id")
+
+
+class UpdateTaskStatus(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    status = None
+
+    def get_queryset(self):
+        task_id = self.request.query_params.get("taskID")
+        return Task.objects.filter(id=task_id).first()
+
+    def update(self, request):
+        try:
+            status = request.query_params.get("selectedStatus")
+            task = self.get_queryset()
+            task.status = status
+            task.save()
+
+            return Response({"message": "Status Updated Successfully"})
+
+        except Task.DoesNotExist:
+            return Response(
+                {"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class GetEditTaskDetails(RetrieveAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        task_id = self.request.query_params.get("taskID")
+        try:
+            return Task.objects.select_related(
+                "workspace", "group", "assigned_by", "assigned_to"
+            ).get(id=task_id)
+        except Task.DoesNotExist:
+            return Response(
+                {"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class EditTask(UpdateAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Task.objects.all()
+
+    def get_object(self):
+        task_id = self.request.query_params.get("taskID")
+        try:
+            return Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            raise Http404("Task not found")
+
+    def put(self, request, *args, **kwargs):
+        task = self.get_object()
+        serializer = self.get_serializer(task, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Task Updated Successfully"}, status=status.HTTP_200_OK
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteTask(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Task.objects.all()
+
+    def delete(self, request, *args, **kwargs):
+        task_id = self.request.query_params.get("taskID")
+        try:
+            task = Task.objects.get(pk=task_id)
+            task.delete()
+            return Response(
+                {"message": "Task Deleted Successfully"},
+                status=status.HTTP_200_OK,
+            )
+        except Task.DoesNotExist:
+            return Response(
+                {"error": "Task not found."}, status=status.HTTP_404_NOT_FOUND
+            )

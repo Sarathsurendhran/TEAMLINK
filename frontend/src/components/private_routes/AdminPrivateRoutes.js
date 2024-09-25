@@ -15,7 +15,7 @@ const AdminPrivateRoutes = ({ children }) => {
       setIsAdmin(authInfo.isAdmin);
       setTimeout(() => {
         setLoading(false);
-      }, 2000);
+      }, 1000);
     };
     fetchData();
   }, []);
@@ -28,8 +28,6 @@ const AdminPrivateRoutes = ({ children }) => {
     );
   }
 
-  console.log("admin", isAdmin)
-  console.log("isAuthenticated", isAuthenticated)
 
   // Redirect to login if not authenticated or not admin
   if (!isAuthenticated || !isAdmin) {

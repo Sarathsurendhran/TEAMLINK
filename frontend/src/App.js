@@ -13,6 +13,7 @@ import CheckingIsBlocked from "./components/wrapper/checking_isblocked";
 
 
 function App() {
+  
   return (
     <>
       <BrowserRouter>
@@ -29,7 +30,7 @@ function App() {
       {/* for toastify alert */}
       <ToastContainer
         position="top-right"
-        autoClose={3000}
+        autoClose={1000}
         hideProgressBar
         newestOnTop={false}
         closeOnClick
