@@ -15,6 +15,7 @@ const EditGroup = () => {
   const dispatch = useDispatch();
 
   const groupId = useSelector((state) => state.group.groupId);
+  const workspaceID = useSelector((state) => state.workspace.workspaceId);
 
   const [isNameEditing, setIsNameEditing] = useState(false);
   const [isDescriptionEditing, setIsDescriptionEditing] = useState(false);
@@ -29,7 +30,7 @@ const EditGroup = () => {
   // fetching current group details and members of the current groups
   useEffect(() => {
     fetchGroupsData();
-  }, [groupId]);
+  }, [groupId, workspaceID]);
 
   const fetchGroupsData = async () => {
     const config = {
@@ -52,7 +53,7 @@ const EditGroup = () => {
         setCurrentGroupName(response.data.group.group_name);
         setDescription(response.data.group.description);
         setTopic(response.data.group.topic);
-        setCurrentGroupCreatorName(response.data.group_creator)
+        setCurrentGroupCreatorName(response.data.group_creator);
 
         const createdDate = new Date(
           response.data.group.created_on
@@ -107,7 +108,7 @@ const EditGroup = () => {
       const response = await axios.put(
         `${baseURL}group/update-group-name/`,
         data,
-        config,
+        config
       );
       if (response.status === 200) {
         toast.success(response.data.message);
@@ -136,7 +137,7 @@ const EditGroup = () => {
       const response = await axios.put(
         `${baseURL}group/update-group-description/`,
         data,
-        config,
+        config
       );
       if (response.status === 200) {
         toast.success(response.data.message);
@@ -167,7 +168,7 @@ const EditGroup = () => {
       const response = await axios.put(
         `${baseURL}group/update-group-topic/`,
         data,
-        config,
+        config
       );
       if (response.status === 200) {
         toast.success(response.data.message);

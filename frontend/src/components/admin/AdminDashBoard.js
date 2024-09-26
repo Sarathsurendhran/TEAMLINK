@@ -120,8 +120,8 @@ const AdminDashboard = () => {
               </div>
               <div className="bg-red-600 p-4 rounded-md shadow-md flex flex-col justify-between">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-white">REPORTS</h3>
-                  <ReportIcon className="text-white" fontSize="large" />
+                  <h3 className="text-white">GROUPS</h3>
+                  {/* <ReportIcon className="text-white" fontSize="large" /> */}
                 </div>
                 <h1 className="text-2xl font-bold mt-4 text-white">
                   {totalReportedPosts}

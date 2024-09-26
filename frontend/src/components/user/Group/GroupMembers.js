@@ -23,7 +23,7 @@ const GroupMembers = () => {
   // fetching current group details and members of the current groups
   useEffect(() => {
     fetchGroupsData();
-  }, [groupId]);
+  }, [groupId, workspaceID]);
 
   const fetchGroupsData = async () => {
     const config = {

@@ -12,7 +12,6 @@ import { useSelector } from "react-redux";
 
 const ProfileModal = ({ open, handleClose }) => {
   const groupName = useSelector((state)=>state.group.groupName)
-  console.log(groupName)
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));

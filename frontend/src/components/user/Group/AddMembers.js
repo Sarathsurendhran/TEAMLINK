@@ -24,7 +24,7 @@ const style = {
   color: "white",
 };
 
-export default function AddMembers({fetchGroupsData}) {
+export default function AddMembers({ fetchGroupsData }) {
   const workspaceID = useSelector((state) => state.workspace.workspaceId);
   const workspaceAdmin = useSelector((state) => state.workspace.workspaceAdmin);
   const authenticated_user = useSelector((state) => state.authenticationUser);
@@ -55,7 +55,7 @@ export default function AddMembers({fetchGroupsData}) {
       },
       params: {
         workspaceID: workspaceID,
-        groupId:groupId,
+        groupId: groupId,
       },
     };
     try {
@@ -72,8 +72,8 @@ export default function AddMembers({fetchGroupsData}) {
     }
   };
 
-  if(open){
-    fetchUsers()
+  if (open) {
+    fetchUsers();
   }
 
   // add members to the group
@@ -84,7 +84,7 @@ export default function AddMembers({fetchGroupsData}) {
       },
       params: {
         groupId: groupId,
-        workspaceID:workspaceID,
+        workspaceID: workspaceID,
       },
     };
     try {
@@ -94,25 +94,27 @@ export default function AddMembers({fetchGroupsData}) {
         config
       );
       if (response.status === 201) {
-        fetchUsers()
-        toast.success(response.data.message)
-        handleClose()
-        fetchGroupsData()
-      }else{
-        handleClose()
-        toast.error(response.data.message)
-        fetchGroupsData()
+        fetchUsers();
+        toast.success(response.data.message);
+        handleClose();
+        fetchGroupsData();
+      } else {
+        handleClose();
+        toast.error(response.data.message);
+        fetchGroupsData();
       }
     } catch (error) {
-      handleClose()
+      handleClose();
       console.log(error);
     }
   };
 
   return (
     <div>
-      <button className="p-1 bg-green-600 rounded" onClick={handleOpen}>Add Members</button>
-      
+      <button className="p-1 bg-green-600 rounded" onClick={handleOpen}>
+        Add Members
+      </button>
+
       <Modal
         open={open}
         onClose={handleClose}
@@ -122,33 +124,29 @@ export default function AddMembers({fetchGroupsData}) {
         <Box sx={style}>
           <h1 className="text-white font-bold text-xl ml-3 mb-3">Add Users</h1>
           <ul className="">
-            {workspaceMembers.map((member, index) => (
-              <li
-                key={index}
-                className="flex justify-between p-2 text-white m-2 rounded-sm items-center border"
-              >
-                <div className="flex items-center space-x-2">
-                  <span>{member.user.username}</span>
-                  {/* {member.is_admin && (
-                <span className="text-red-500 text-sm">admin</span>
-              )} */}
-                  {/* {member.user.id === authenticated_user_id && (
-                <span className="text-red-500 text-sm">(you)</span>
-              )} */}
-                </div>
+            {workspaceMembers.length > 0 ? (
+              workspaceMembers.map((member, index) => (
+                <li
+                  key={index}
+                  className="flex justify-between p-2 text-white m-2 rounded-sm items-center border"
+                >
+                  <div className="flex items-center space-x-2">
+                    <span>{member.user.username}</span>
+                  </div>
 
-                {/* {!member.is_admin &&
-              member.user.id !== authenticated_user_id &&
-              isWorkspaceAdmin && (
-                <ConfirmMessageModal
-                  removeMember={() => removeMember(member.user.id)}
-                />
-              )} */}
-                
-                <button className="p-1 bg-blue-700 rounded" onClick={()=>addMember(member.id)}>ADD</button>
-           
-              </li>
-            ))}
+                  <button
+                    className="p-1 bg-blue-700 rounded"
+                    onClick={() => addMember(member.id)}
+                  >
+                    ADD
+                  </button>
+                </li>
+              ))
+            ) : (
+              <div className="flex justify-center items-center mt-36 text-lg text-red-500">
+                No Users Found! . Add Users to the workspace
+              </div>
+            )}
           </ul>
         </Box>
       </Modal>

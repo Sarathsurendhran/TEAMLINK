@@ -55,10 +55,13 @@ export default function AssignedTaskTables() {
       params: { taskID },
     };
     try {
-      const response = await axios.delete(`${baseURL}group/delete-task`, config);
+      const response = await axios.delete(
+        `${baseURL}group/delete-task`,
+        config
+      );
       if (response.status === 200) {
-        toast.success(response.data.message)
-        fetchTaskDetails()
+        toast.success(response.data.message);
+        fetchTaskDetails();
       }
     } catch (error) {
       console.log("Something went wrong", error);
@@ -72,117 +75,130 @@ export default function AssignedTaskTables() {
   return (
     <>
       <div className="mt-20  max-w-[76rem] ml-auto">
-        <div className="inline-block min-w-full align-middle">
-          <div className="overflow-hidden">
-            <table className="min-w-full divide-y  divide-gray-300 table-fixed">
-              <thead className="bg-gray-300">
-                <tr>
-                  <th
-                    scope="col"
-                    className="py-4 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
-                  >
-                    Groups
-                  </th>
-                  <th
-                    scope="col"
-                    className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
-                  >
-                    Tasks
-                  </th>
-                  <th
-                    scope="col"
-                    className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
-                  >
-                    Task Description
-                  </th>
-                  <th
-                    scope="col"
-                    className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
-                  >
-                    Assigned To
-                  </th>
-                  <th
-                    scope="col"
-                    className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
-                  >
-                    Status
-                  </th>
-                  <th
-                    scope="col"
-                    className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
-                  >
-                    start date
-                  </th>
-                  <th
-                    scope="col"
-                    className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
-                  >
-                    end date
-                  </th>
-                  <th
-                    scope="col"
-                    className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
-                  >
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-300">
-                {tasks.map((task) => (
-                  <tr key={task.id} className="hover:bg-gray-100">
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900 uppercase">
-                      {task.group_name}
-                    </td>
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900">
-                      {task.task_name}
-                    </td>
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900">
-                      {task.task_description}
-                    </td>
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900 uppercase">
-                      {task.assigned_to_username}
-                    </td>
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900 uppercase">
-                      {task.status}
-                    </td>
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900">
-                    {new Date(task.start_date).toLocaleDateString('en-GB')}
-                    </td>
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900 ">
-                    {new Date(task.end_date).toLocaleDateString('en-GB')}
-                    </td>
-                    <td className="flex mt-3 text-sm font-medium text-gray-900">
-                      <EditTaskModal taskID={task.id} fetchTaskDetails={fetchTaskDetails}/>
-                      <button
-                        className="py-1 px-2 bg-red-400 rounded"
-                        onClick={() => handleDeleteTask(task.id)}
+        {tasks.length > 0 ? (
+          <>
+            <div className="inline-block min-w-full align-middle">
+              <div className="overflow-hidden">
+                <table className="min-w-full divide-y  divide-gray-300 table-fixed">
+                  <thead className="bg-gray-300">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="py-4 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
                       >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        Groups
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
+                      >
+                        Tasks
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
+                      >
+                        Task Description
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
+                      >
+                        Assigned To
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
+                      >
+                        Status
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
+                      >
+                        start date
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
+                      >
+                        end date
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3 px-6 text-sm font-medium tracking-wider text-left text-gray-700 uppercase"
+                      >
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-300">
+                    {tasks.map((task) => (
+                      <tr key={task.id} className="hover:bg-gray-100">
+                        <td className="py-4 px-6 text-sm font-medium text-gray-900 uppercase">
+                          {task.group_name}
+                        </td>
+                        <td className="py-4 px-6 text-sm font-medium text-gray-900">
+                          {task.task_name}
+                        </td>
+                        <td className="py-4 px-6 text-sm font-medium text-gray-900">
+                          {task.task_description}
+                        </td>
+                        <td className="py-4 px-6 text-sm font-medium text-gray-900 uppercase">
+                          {task.assigned_to_username}
+                        </td>
+                        <td className="py-4 px-6 text-sm font-medium text-gray-900 uppercase">
+                          {task.status}
+                        </td>
+                        <td className="py-4 px-6 text-sm font-medium text-gray-900">
+                          {new Date(task.start_date).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-sm font-medium text-gray-900 ">
+                          {new Date(task.end_date).toLocaleDateString("en-GB")}
+                        </td>
+                        <td className="flex mt-3 text-sm font-medium text-gray-900">
+                          <EditTaskModal
+                            taskID={task.id}
+                            fetchTaskDetails={fetchTaskDetails}
+                          />
+                          <button
+                            className="py-1 px-2 bg-red-400 rounded"
+                            onClick={() => handleDeleteTask(task.id)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {/* Pagination Controls */}
+            <div className="mt-4 flex justify-between items-center">
+              <button
+                onClick={() => handlePageChange(prevPageUrl)}
+                disabled={!prevPageUrl}
+                className="px-4 py-1 bg-gray-300 shadow-xl border ml-2 rounded hover:bg-gray-200 cursor-pointer"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => handlePageChange(nextPageUrl)}
+                disabled={!nextPageUrl}
+                className="px-4 py-1 bg-gray-300 shadow-xl border mr-2  rounded hover:bg-gray-200"
+              >
+                Next
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="text-red-500 flex justify-center items-center mt-52 text-xl font-bold">
+            <span>No tasks have been assigned yet. Assign tasks to users to view them here.</span>
           </div>
-        </div>
-        {/* Pagination Controls */}
-        <div className="mt-4 flex justify-between items-center">
-          <button
-            onClick={() => handlePageChange(prevPageUrl)}
-            disabled={!prevPageUrl}
-            className="px-4 py-1 bg-gray-300 shadow-xl border ml-2 rounded hover:bg-gray-200 cursor-pointer"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => handlePageChange(nextPageUrl)}
-            disabled={!nextPageUrl}
-            className="px-4 py-1 bg-gray-300 shadow-xl border mr-2  rounded hover:bg-gray-200"
-          >
-            Next
-          </button>
-        </div>
+        )}
       </div>
     </>
   );

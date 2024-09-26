@@ -114,7 +114,7 @@ class GetGroupDetails(APIView):
 
         try:
             group = WorkspaceGroups.objects.get(id=group_id)
-            members = GroupMembers.objects.filter(group=group_id)
+            members = GroupMembers.objects.filter(group=group_id, member__user__is_active=True)
 
             group_serializer = WorkspaceGroupSerializer(group)
             members_serializer = GroupMembersSerializer(members, many=True)

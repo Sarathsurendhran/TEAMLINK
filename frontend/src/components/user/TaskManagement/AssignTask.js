@@ -28,7 +28,7 @@ export default function AssignTaskModal() {
   const workspaceID = useSelector((state) => state.workspace.workspaceId);
   const groupID = useSelector((state) => state.group.groupId);
   const authenticatedUser = useSelector((state) => state.authenticationUser.id);
-  const workspaceAdmin = useSelector((state)=> state.workspace.workspaceAdmin)
+  const workspaceAdmin = useSelector((state) => state.workspace.workspaceAdmin);
 
   const filteredUsers = members.filter((user) =>
     user.username.toLowerCase().includes(userSearch.toLowerCase())
@@ -36,7 +36,6 @@ export default function AssignTaskModal() {
 
   const handleOpen = () => {
     setOpen(true);
-    fetechUsers();
   };
   const handleClose = () => setOpen(false);
 
@@ -58,6 +57,10 @@ export default function AssignTaskModal() {
       console.log("error fetching data");
     }
   };
+
+  useEffect(()=>{
+    fetechUsers();
+  },[groupID, workspaceID])
 
   const handleSubmit = () => {
     if (!taskName || !taskDesc || !startDate || !endDate || !selectedUser) {
@@ -117,11 +120,15 @@ export default function AssignTaskModal() {
   return (
     <div>
       <button
-        className="bg-green-500 p-1 rounded text-white"
-        onClick={handleOpen}
+        className={`bg-green-500 p-1 rounded text-white ${
+          members.length <= 1 ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+        onClick={members.length > 1 ? handleOpen : null}
+        disabled={members.length <= 1}
       >
         Assign Tasks
       </button>
+
       <Modal
         open={open}
         onClose={handleClose}
@@ -187,7 +194,7 @@ export default function AssignTaskModal() {
                 onChange={(e) => setUserSearch(e.target.value)}
               />
               <div className="mt-2 text-white">
-                {filteredUsers.length > 0 ? (
+                {filteredUsers.length > 1 ? (
                   <ul className="border border-white rounded p-2 h-24 overflow-auto">
                     {filteredUsers.map((user) => (
                       <li
@@ -204,9 +211,8 @@ export default function AssignTaskModal() {
                           })
                         }
                       >
-                        {user.user_id !== workspaceAdmin &&(
-
-                        <li>{user.username}</li>
+                        {user.user_id !== workspaceAdmin && (
+                          <li>{user.username}</li>
                         )}
                       </li>
                     ))}
