@@ -37,7 +37,12 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         # await self.send_existing_messages()
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        try:
+           
+            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        except Exception as e:
+            print(f"Error in disconnect: {e}")
+
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -308,9 +313,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         self.workspace_id = self.scope["url_route"]["kwargs"]["workspace_id"]
         self.groups = await self.get_user_groups(self.user_id, self.workspace_id)
 
-        for group in self.groups:
-            room_group_name = f"notification_{group}"
-            await self.channel_layer.group_add(room_group_name, self.channel_name)
+        if self.groups:
+            for group in self.groups:
+                room_group_name = f"notification_{str(group)}"
+                print(f"Group being added: {room_group_name}")
+                await self.channel_layer.group_add(room_group_name, self.channel_name)
 
         await self.accept()
 
@@ -342,12 +349,15 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user_groups(self, user_id, workspace_id):
-        # Assuming GroupMembers has a foreign key to WorkSpaceMembers
         return list(
-            GroupMembers.objects.filter(
-                member__user_id=user_id, member__workspace_id=workspace_id
-            ).values_list("group_id", flat=True)
+            map(str, 
+                GroupMembers.objects.filter(
+                    member__user_id=user_id, 
+                    member__workspace_id=workspace_id
+                ).values_list("group_id", flat=True)
+            )
         )
+
 
     async def trigger_unread_notifications(self, event):
         # Retrieve unread notifications and count
@@ -387,9 +397,17 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
         return unread_count, unread_messages
 
-    async def disconnect(self):
-        room_group_name = f"notification_{self.room_group_name}"
-        await self.channel_layer.group_discard(room_group_name, self.channel_name)
+    async def disconnect(self, close_code):
+        for group in self.groups:
+            
+            room_group_name = f"notification_{str(group)}"
+            try:
+                await self.channel_layer.group_discard(room_group_name, self.channel_name)
+            except Exception as e:
+                # Log the error for debugging purposes
+                print(f"Error while discarding from group {room_group_name}: {e}")
+
+
 
     async def send_notification(self, event):
         # Parse the JSON string in the `value` field

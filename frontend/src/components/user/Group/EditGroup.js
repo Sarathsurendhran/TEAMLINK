@@ -4,7 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
-import GroupMembers from "./GroupMembers";
+import { setGroupId, setGroupName } from "../../../Redux/Groups/GroupSlice";
+
 
 const EditGroup = () => {
   const [groupData, setGroupData] = useState();
@@ -49,17 +50,18 @@ const EditGroup = () => {
       if (response.status === 200) {
         setGroupData(response.data.group);
         setGroupMembers(response.data.members);
-
+        
         setCurrentGroupName(response.data.group.group_name);
         setDescription(response.data.group.description);
         setTopic(response.data.group.topic);
         setCurrentGroupCreatorName(response.data.group_creator);
-
+        
         const createdDate = new Date(
           response.data.group.created_on
         ).toLocaleDateString();
         setCurrentGroupCreatedOn(createdDate);
-
+        
+        dispatch(setGroupName(response.data.group.group_name))
         console.log("success");
       }
     } catch (error) {
@@ -113,6 +115,7 @@ const EditGroup = () => {
       if (response.status === 200) {
         toast.success(response.data.message);
         fetchGroupsData();
+        
       }
     } catch (error) {
       console.log(error);

@@ -194,7 +194,7 @@ export default function AssignTaskModal() {
                 onChange={(e) => setUserSearch(e.target.value)}
               />
               <div className="mt-2 text-white">
-                {filteredUsers.length > 1 ? (
+                {filteredUsers.length > 0 ? (
                   <ul className="border border-white rounded p-2 h-24 overflow-auto">
                     {filteredUsers.map((user) => (
                       <li

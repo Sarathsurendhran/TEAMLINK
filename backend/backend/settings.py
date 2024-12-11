@@ -13,8 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
-from dotenv import load_dotenv
-load_dotenv()
+from decouple import config
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,15 +24,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY","django-insecure-fk_y9f(&&qyxl(5&sht-5)dw%)_2ew)=n%qk&h9s=h&51*^j9t")
-
+SECRET_KEY = config(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-fk_y9f(&&qyxl(5&sht-5)dw%)_2ew)=n%qk&h9s=h&51*^j9t",
+)
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DJANGO_DEBUG", default=False)
+DEBUG = config("DJANGO_DEBUG", default=False)
 
-# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS")
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS")
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -46,21 +47,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "corsheaders",
-
     "users",
     "workspaces",
     "admin_side",
     "group_chat",
     "dm_chat",
-    
     # drf
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
-
-  
-    'channels',
+    "channels",
 ]
 
 AUTH_USER_MODEL = "users.User"
@@ -70,8 +66,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 8,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 8,
 }
 
 
@@ -139,7 +135,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                
             ],
         },
     },
@@ -149,29 +144,33 @@ TEMPLATES = [
 ASGI_APPLICATION = "backend.asgi.application"
 
 
-
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [(os.environ.get("REDIS_HOST", "127.0.0.1"))]},
+        "CONFIG": {
+            "hosts": [
+                (
+                    config("REDIS_HOST", "127.0.0.1"),
+                    int(config("REDIS_PORT", 6379)),
+                ),
+            ],
+        },
     }
 }
-
 
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME"),
-        "USER": os.environ.get("DB_USER"),
-        "PASSWORD": os.environ.get("DB_PASSWORD"),
-        "HOST": os.environ.get("DB_HOST"),
-        "PORT": os.environ.get("DB_PORT"),
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST"),
+        "PORT": config("DB_PORT"),
     }
 }
 
@@ -193,6 +192,8 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Internationalization
@@ -229,17 +230,17 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "teamlink904@gmail.com")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "default-password")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Celery <teamlink904@gmail.com>")
-
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", "teamlink904@gmail.com")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", "default-password")
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL", "Celery <teamlink904@gmail.com>"
+)
 
 
 # CELERY SETTINGS
-broker_url = os.environ.get("CELERY_BROKER_URL", 'redis://localhost:6379/0')
-result_backend = os.environ.get("CELERY_RESULT_BACKEND", 'redis://localhost:6379/0')
-accept_content = ['json']  
-result_serializer = 'json'
-task_serializer = 'json'
-timezone = 'Asia/Kolkata'
-
+broker_url = config("CELERY_BROKER_URL", "redis://localhost:6379/0")
+result_backend = config("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+accept_content = ["json"]
+result_serializer = "json"
+task_serializer = "json"
+timezone = "Asia/Kolkata"

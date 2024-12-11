@@ -100,7 +100,7 @@ const WorkspaceSidebar = () => {
               <Avatar
                 src={
                   profileImage
-                    ? baseURL.replace(/\/$/, "") + profileImage
+                    ? baseURL.replace('/api/', '').replace(/\/$/, '') + profileImage
                     : "/broken-image.jpg"
                 }
               />

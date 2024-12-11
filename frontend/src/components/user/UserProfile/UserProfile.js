@@ -26,13 +26,12 @@ export default function UserProfile({ open, toggleDrawer }) {
   const authenticated_user_id = authenticated_user
     ? authenticated_user.id
     : null;
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const accessToken = localStorage.getItem("access");
   const [isPhotoSelected, setIsPhotoSelected] = useState(false);
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
-  
 
   const handlePhotoChange = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -40,8 +39,6 @@ export default function UserProfile({ open, toggleDrawer }) {
       setIsPhotoSelected(true);
     }
   };
-
-
 
   useEffect(() => {
     fetchUserData();
@@ -60,7 +57,7 @@ export default function UserProfile({ open, toggleDrawer }) {
         setAbout(response.data.about_me);
         setEmail(response.data.user.email);
         setProfilePicUrl(response.data.profile_picture);
-        dispatch(setProfileImage(response.data.profile_picture))
+        dispatch(setProfileImage(response.data.profile_picture));
       }
     } catch (error) {
       console.log(error);
@@ -154,7 +151,7 @@ export default function UserProfile({ open, toggleDrawer }) {
         toast.success(response.data.message);
         console.log("ProfilePic updated");
         fetchUserData();
-        setIsPhotoSelected(false)
+        setIsPhotoSelected(false);
       } else {
         toast.error(response.data.message);
       }
@@ -162,8 +159,6 @@ export default function UserProfile({ open, toggleDrawer }) {
       console.log(error);
     }
   };
-
-
 
   const DrawerList = (
     <>
@@ -189,10 +184,10 @@ export default function UserProfile({ open, toggleDrawer }) {
         <Box sx={{ textAlign: "center", mt: 3 }}>
           <Avatar
             alt="User Photo"
-            src={baseURL.replace(/\/$/, '') + profilePicUrl} 
+            src={baseURL.replace('/api/', '').replace(/\/$/, '') + profilePicUrl}
             sx={{ width: 100, height: 100, margin: "0 auto" }}
           />
-  
+
           <input
             accept="image/*"
             style={{ display: "none" }}
@@ -216,7 +211,7 @@ export default function UserProfile({ open, toggleDrawer }) {
               variant="contained"
               color="secondary"
               onClick={changeUserProfilePic}
-              sx={{ mt: 2, ml:1 }}
+              sx={{ mt: 2, ml: 1 }}
             >
               Submit
             </Button>

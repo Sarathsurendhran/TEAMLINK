@@ -18,7 +18,7 @@ class ChatPaginator:
         return page
 
     def get_next_page_number(self, page):
-      
+
         return page.next_page_number() if page.has_next() else None
 
 
@@ -29,11 +29,17 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         user_ids = sorted([user_id1, user_id2])
         self.room_name = f"chat_{user_ids[0]}-{user_ids[1]}"
 
+
         await self.channel_layer.group_add(self.room_name, self.channel_name)
         await self.accept()
 
     async def disconnect(self, code):
-        await self.channel_layer.group_discard(self.room_name, self.channel_name)
+        try:
+          
+            await self.channel_layer.group_discard(self.room_name, self.channel_name)
+        except Exception as e:
+            # Log or print the error
+            print(f"Error while disconnecting: {e}")
 
     async def receive(self, text_data=None):
         data = json.loads(text_data)
@@ -41,7 +47,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         action = data.get("action", "")
         page_number = data.get("page_number", 1)
 
-        print(f"Received action: {action}, page_number: {page_number}") 
+        print(f"Received action: {action}, page_number: {page_number}")
 
         if action == "load_more":
 
@@ -49,7 +55,6 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
 
             messages = paginated_data.get("messages", [])[::-1]
             next_page_number = paginated_data.get("next_page_number", None)
-
 
             # Prepare the payload to send back to the client
             payload = {
@@ -69,14 +74,19 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             message_type = data.get("type", "text_message")
             link = data.get("link", "")
 
-            if sender and message_type in ["text_message", "photo", "video", "audio", "file"]:
+            if sender and message_type in [
+                "text_message",
+                "photo",
+                "video",
+                "audio",
+                "file",
+            ]:
                 await self.save_message(sender, message, message_type)
 
             if message_type in ["video_call", "audio_call"]:
                 await self.send_call_link(link, sender, message_type)
 
             await self.broadcast_message(message, sender, time, message_type)
-
 
             # Send a notification to the receiver
             await self.notify_receiver(sender, message, time)
@@ -155,22 +165,19 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         sender_name = User.objects.get(id=sender)
         return sender_name.username
 
-
-
     @database_sync_to_async
     def get_existing_messages(self, page_number):
         paginator = ChatPaginator()
 
-        messages = OneToOneChatMessages.objects.filter(
-            room=self.room_name
-        ).order_by("-time_stamp")
+        messages = OneToOneChatMessages.objects.filter(room=self.room_name).order_by(
+            "-time_stamp"
+        )
 
         page = paginator.paginate_queryset(messages, page_number)
 
         return {
             "messages": [
                 {
-
                     "message": message.message,
                     "sender": message.sender_id,
                     "time": message.time_stamp.isoformat(),
@@ -179,10 +186,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
                 for message in page
             ],
             "next_page_number": paginator.get_next_page_number(page),
-            
         }
-
-
 
     async def save_message(self, sender, message, message_type):
         sender_instance = await self.get_member_instance(sender)
@@ -229,13 +233,17 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps(notification))
 
     async def disconnect(self, close_code):
-        # Remove the user from the notification group
-        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        try:
+           
+            # Remove the user from the notification group
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        except Exception as e:
+            # Log the error
+            print(f"Error while disconnecting from group {self.group_name}: {e}")
 
     async def send_notification(self, event):
         # Send the notification to the WebSocket client
         notification = json.loads(event["value"])
-
 
         await self.send(text_data=json.dumps(notification))
 

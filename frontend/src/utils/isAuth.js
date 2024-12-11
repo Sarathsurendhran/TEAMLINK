@@ -19,18 +19,18 @@ const updateUserToken = async () => {
         username: decoded.username,
         id: decoded.user_id,
         isAuthenticated: true,
-        isAdmin:decoded.isAdmin
+        isAdmin: decoded.isAdmin,
       };
     } else {
       return {
         username: null,
         id: null,
         isAuthenticated: false,
-        isAdmin:null
+        isAdmin: null,
       };
     }
   } catch (error) {
-    return { username: null, id: null, isAuthenticated: false, isAdmin:null };
+    return { username: null, id: null, isAuthenticated: false, isAdmin: null };
   }
 };
 
@@ -38,20 +38,19 @@ const isAuthUser = async () => {
   const accessToken = localStorage.getItem("access");
 
   if (!accessToken) {
-    return { username: null, id: null, isAuthenticated: false, isAdmin:null };
+    return { username: null, id: null, isAuthenticated: false, isAdmin: null };
   }
 
   const currentTime = Date.now() / 1000;
 
   let decoded_token = jwtDecode(accessToken);
 
-
   if (decoded_token.exp > currentTime) {
     return {
       id: decoded_token.user_id,
       username: decoded_token.username,
       isAuthenticated: true,
-      isAdmin:decoded_token.isAdmin
+      isAdmin: decoded_token.isAdmin,
     };
   } else {
     const updateSuccess = await updateUserToken();

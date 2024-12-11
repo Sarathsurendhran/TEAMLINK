@@ -8,34 +8,21 @@ services:
       - "6379:6379"
     restart: always
 
-  # db:
-  #   image: postgres:16
-  #   container_name: teamlink-postgres-1
-  #   env_file:
-  #     - ./backend/.env
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-  #   restart: always
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfilefrontenddev
-    ports:
-      - "3000:80"
-    volumes:
-      - ./frontend:/app  
-      - /app/node_modules
+  db:
+    image: postgres:16
+    container_name: teamlink-postgres-1
     env_file:
-      - ./frontend/.env
-    environment:
-      - CHOKIDAR_USEPOLLING=true
+      - ./backend/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     restart: always
 
   # frontend:
-  #   image: sarath583364/teamlink-frontend
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.frontend
   #   ports:
   #     - "3000:80"
   #   volumes:
@@ -47,10 +34,23 @@ services:
   #     - CHOKIDAR_USEPOLLING=true
   #   restart: always
 
+  frontend:
+    image: sarath583364/teamlink-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/app  
+      - /app/node_modules
+    env_file:
+      - ./frontend/.env
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    restart: always
+
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfilebackenddev
+      dockerfile: Dockerfile.backend
     ports:
       - "8000:8000"
     volumes:
@@ -62,7 +62,7 @@ services:
       - DJANGO_SETTINGS_MODULE=backend.settings
     depends_on:
       - redis
-      # - db
+      - db
     restart: always
 
   # backend:

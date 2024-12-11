@@ -217,7 +217,7 @@ const Chat = () => {
                       {msg.username}
                     </div>
                     <div className="bg-white   text-black rounded-lg p-2 shadow-xl mb-2 text-lg">
-                      {msg.message.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
+                      {msg.message.match(/\.(jpeg|jpg|gif|png|webp|svg)$/) ? (
                         <img
                           src={msg.message}
                           alt="Message Content"
@@ -244,7 +244,7 @@ const Chat = () => {
                           />
                           Your browser does not support the video element.
                         </video>
-                      ) : msg.message.match(/\.(docx|pdf|txt|xlsx|xls)$/) ? (
+                      ) : msg.message.match(/\.(docx|pdf|txt|xlsx|xls|html|csv|zip)$/) ? (
                         <div className="flex items-center">
                           <span className="material-icons mr-2">
                             <InsertDriveFileIcon />

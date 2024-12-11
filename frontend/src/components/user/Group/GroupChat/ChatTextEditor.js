@@ -204,8 +204,7 @@ const ChatTextEditor = ({ sendMessage, readyState }) => {
     formData.append("upload_preset", "TeamLink");
     formData.append("cloud_name", "daymlb11q");
     formData.append("folder", "TeamLink");
-    // formData.append("use_filename", "true");
-    // formData.append("unique_filename", "false");
+
 
     try {
       const response = await fetch(
@@ -243,6 +242,7 @@ const ChatTextEditor = ({ sendMessage, readyState }) => {
       console.log(error);
     }
   };
+
 
   return (
     <div className="w-full flex justify-center">

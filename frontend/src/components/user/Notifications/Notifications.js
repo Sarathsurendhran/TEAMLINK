@@ -43,6 +43,7 @@ export default function Notifications() {
       shouldReconnect: (closeEvent) => true,
     });
 
+    
   // WebSocket for personal chat notifications
   const { lastMessage: lastPersonalMessage, readyState: personalReadyState } =
     useWebSocket(`${webSocketURL}ws/personal-notification/${id}/`, {

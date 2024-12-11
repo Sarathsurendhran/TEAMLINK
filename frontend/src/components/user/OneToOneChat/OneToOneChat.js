@@ -62,7 +62,7 @@ export default function OneToOneChat() {
     );
   };
 
-  console.log("pageNumber", pageNumber)
+  console.log("pageNumber", pageNumber);
 
   const loadMoreMessages = () => {
     if (!hasMore || isLoadingMore) return;
@@ -75,13 +75,11 @@ export default function OneToOneChat() {
     );
   };
 
-
-
   useEffect(() => {
     if (lastMessage?.data) {
       const messageData = JSON.parse(lastMessage.data);
 
-      console.log(messageData)
+      console.log(messageData);
 
       if (messageData.type === "video_call") {
         if (messageData.sender === id) {
@@ -106,11 +104,9 @@ export default function OneToOneChat() {
 
         if (chatContainerRef.current) {
           const chatContainer = chatContainerRef.current;
-          const offset = 50; 
+          const offset = 50;
           chatContainer.scrollTop = offset;
         }
-        
-
       } else if (messageData.message_type === "real_time_message") {
         setChatHistory((prev) => [...prev, messageData]);
         if (chatContainerRef.current) {
@@ -239,15 +235,23 @@ export default function OneToOneChat() {
                           />
                           Your browser does not support the video element.
                         </video>
-                      ) : msg.message.match(/\.(docx|pdf|txt|xlsx|xls)$/) ? (
+                      ) : msg.message.match(
+                          /\.(docx|pdf|txt|xlsx|xls|html|csv|zip)$/
+                        ) ? (
                         <div className="flex items-center">
-                          <InsertDriveFileIcon className="mr-2" />
+                          <span className="material-icons mr-2">
+                            <InsertDriveFileIcon />
+                          </span>
                           <a
                             href={msg.message}
                             download
                             className="text-blue-500 underline"
                           >
-                            {msg.message.split("/").pop()}
+                            {msg.message.split("/").pop().length > 20
+                              ? msg.message.split("/").pop().substring(0, 20) +
+                                "..."
+                              : msg.message.split("/").pop()}
+                            {/* Display truncated file name */}
                           </a>
                         </div>
                       ) : (

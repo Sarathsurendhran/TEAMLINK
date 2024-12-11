@@ -32,10 +32,12 @@ const WorkspacesGroups = () => {
   const authenticated_user_id = authenticated_user
     ? authenticated_user.id
     : null;
+  const selectedGroupID = useSelector((state)=> state.group.groupId)
+  const GroupName = useSelector((state)=> state.group.groupName)
 
   useEffect(() => {
     fetchGroupsData();
-  }, [workspaceID]);
+  }, [workspaceID, GroupName]);
 
   const fetchGroupsData = async () => {
     const accessTokem = localStorage.getItem("access");
@@ -153,7 +155,7 @@ const WorkspacesGroups = () => {
                 >
                   <button
                     type="button"
-                    className="mt-2 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-500"
+                    className={`mt-2 hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-400 ${selectedGroupID === group.id ? "bg-gray-400" : "text-white"}`}
                     onClick={() =>
                       handleGroupLaunch(group.id, group.group_name)
                     }
