@@ -6,7 +6,7 @@ from urllib.parse import urljoin
 def send_invitation(email, encrypted_data):
     try:
         email_from = settings.EMAIL_HOST_USER
-        base_url = "https://teamlinkconnect.online/register"
+        base_url = "https://teamlink-xi.vercel.app/register"
         invitation_link = urljoin(base_url, f"?join={encrypted_data}")
 
         # HTML content for the email
